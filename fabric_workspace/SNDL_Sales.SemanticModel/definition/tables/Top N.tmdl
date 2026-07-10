@@ -1,0 +1,16 @@
+/// What-if numeric range parameter (5..50 step 5) feeding 'Top N SKU Sales'.
+/// Disconnected calculated table — read via SELECTEDVALUE, default 10.
+table 'Top N'
+	lineageTag: 1a2b3c4d-7100-4a00-9000-000000000001
+
+	column 'Top N'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1a2b3c4d-7101-4a00-9000-000000000001
+		summarizeBy: none
+		sourceColumn: [Value]
+
+	partition 'Top N' = calculated
+		mode: import
+		source = GENERATESERIES(5, 50, 5)
+

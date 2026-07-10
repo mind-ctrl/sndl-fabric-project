@@ -1,0 +1,7 @@
+/// Row-level security — restricts a user to Alberta stores (and everything that
+/// flows from them via the star relationships).
+role 'RLS Alberta Region'
+	modelPermission: read
+
+	tablePermission dim_store = dim_store[province_code] = "AB"
+

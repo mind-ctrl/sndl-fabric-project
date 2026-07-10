@@ -1,0 +1,40 @@
+/// Calculation group — apply time-intelligence to ANY measure via one column.
+/// Requires dim_date marked as the date table (see README). Uses dim_date[date].
+table 'Time Intelligence'
+	lineageTag: 2b3c4d5e-0001-4a00-9000-000000000002
+
+	calculationGroup
+		precedence: 10
+
+		calculationItem Current = SELECTEDMEASURE()
+
+		calculationItem PY = CALCULATE(SELECTEDMEASURE(), SAMEPERIODLASTYEAR(dim_date[date]))
+
+		calculationItem YoY = SELECTEDMEASURE() - CALCULATE(SELECTEDMEASURE(), SAMEPERIODLASTYEAR(dim_date[date]))
+
+		calculationItem 'YoY %' =
+				VAR _py = CALCULATE(SELECTEDMEASURE(), SAMEPERIODLASTYEAR(dim_date[date]))
+				RETURN DIVIDE(SELECTEDMEASURE() - _py, _py)
+
+			formatStringDefinition = "0.0%"
+
+		calculationItem YTD = CALCULATE(SELECTEDMEASURE(), DATESYTD(dim_date[date]))
+
+		calculationItem MTD = CALCULATE(SELECTEDMEASURE(), DATESMTD(dim_date[date]))
+
+		calculationItem QTD = CALCULATE(SELECTEDMEASURE(), DATESQTD(dim_date[date]))
+
+	column 'Time Calc'
+		dataType: string
+		lineageTag: 2b3c4d5e-0002-4a00-9000-000000000002
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+	column Ordinal
+		dataType: int64
+		isHidden
+		lineageTag: 2b3c4d5e-0003-4a00-9000-000000000002
+		summarizeBy: none
+		sourceColumn: Ordinal
+

@@ -1,0 +1,137 @@
+table fact_sales_transaction
+	lineageTag: ac9bc37a-dbdf-4baa-817d-cf5717dc1b93
+
+	column transaction_id
+		dataType: int64
+		isHidden
+		lineageTag: 0450a6ce-b1e9-458f-9e4b-14fe3a83dbf8
+		summarizeBy: none
+		sourceColumn: transaction_id
+
+	column transaction_business_key
+		dataType: string
+		lineageTag: d3a4e940-d755-4d67-9d1e-fc39b017afd1
+		summarizeBy: none
+		sourceColumn: transaction_business_key
+
+	column transaction_date_id
+		dataType: int64
+		isHidden
+		lineageTag: 6eb310c7-c9bf-4569-b43f-28b245cfbd49
+		summarizeBy: none
+		sourceColumn: transaction_date_id
+
+	column transaction_timestamp
+		dataType: dateTime
+		lineageTag: 4af2ba1c-711c-428e-bc4c-9d9e4a100010
+		summarizeBy: none
+		sourceColumn: transaction_timestamp
+
+	column store_id
+		dataType: int64
+		isHidden
+		lineageTag: bf015ddd-dc6e-4062-8fdf-d60073b273b5
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column customer_id
+		dataType: int64
+		isHidden
+		lineageTag: 40b83b46-1cf7-4148-8de7-ece0bac45033
+		summarizeBy: none
+		sourceColumn: customer_id
+
+	column employee_id
+		dataType: int64
+		isHidden
+		lineageTag: 41781cc6-8505-47f5-8eab-974523e6d22c
+		summarizeBy: none
+		sourceColumn: employee_id
+
+	column channel
+		dataType: string
+		lineageTag: 21321a05-2dce-4a7a-9b95-ba92a4f57f3b
+		summarizeBy: none
+		sourceColumn: channel
+
+	column payment_method
+		dataType: string
+		lineageTag: f0c179d6-e77f-4d04-94a3-5803cb9c4736
+		summarizeBy: none
+		sourceColumn: payment_method
+
+	column subtotal_cad
+		dataType: double
+		lineageTag: 7f2612e5-f013-419e-852d-45bd2027157b
+		summarizeBy: none
+		sourceColumn: subtotal_cad
+
+	column discount_amount_cad
+		dataType: double
+		lineageTag: 04784d0a-91ed-468a-a59e-d75923a5d938
+		summarizeBy: none
+		sourceColumn: discount_amount_cad
+
+	column tax_amount_cad
+		dataType: double
+		lineageTag: 30b8e374-2c80-489b-99c3-aa6d73e02d23
+		summarizeBy: none
+		sourceColumn: tax_amount_cad
+
+	column total_amount_cad
+		dataType: double
+		lineageTag: 477eb871-d2c6-4ab6-9fc3-f3cd4a63a65e
+		summarizeBy: none
+		sourceColumn: total_amount_cad
+
+	column item_count
+		dataType: int64
+		lineageTag: 7336b6c0-5e04-4dbc-af0a-b3991341e120
+		summarizeBy: none
+		sourceColumn: item_count
+
+	column unit_count
+		dataType: int64
+		lineageTag: 6626d2ea-e689-402e-be59-eb13e22f511c
+		summarizeBy: none
+		sourceColumn: unit_count
+
+	column loyalty_points_earned
+		dataType: int64
+		lineageTag: c10298f8-b58d-4039-9a19-186897c36584
+		summarizeBy: none
+		sourceColumn: loyalty_points_earned
+
+	column loyalty_points_redeemed
+		dataType: int64
+		lineageTag: e242067f-7b11-4331-aa0b-515b3fe238de
+		summarizeBy: none
+		sourceColumn: loyalty_points_redeemed
+
+	column is_loyalty_transaction
+		dataType: int64
+		lineageTag: 64f08c0f-49ca-427e-aeb2-b4c741191c42
+		summarizeBy: none
+		sourceColumn: is_loyalty_transaction
+
+	column store_sk
+		dataType: int64
+		isHidden
+		lineageTag: a9da715c-5488-4383-b8a0-ff40d99b4393
+		summarizeBy: none
+		sourceColumn: store_sk
+
+	column customer_sk
+		dataType: int64
+		isHidden
+		lineageTag: fc357910-4111-4fa5-8e69-9a368197c349
+		summarizeBy: none
+		sourceColumn: customer_sk
+
+	partition fact_sales_transaction = entity
+		mode: directLake
+		source
+			entityName: fact_sales_transaction
+			schemaName: gold
+			expressionSource: DatabaseQuery
+

@@ -1,0 +1,46 @@
+table dim_banner
+	lineageTag: 4be6c9aa-6830-49a6-85e3-fd7d0854b512
+
+	column banner_id
+		dataType: int64
+		lineageTag: 9664dc59-da1a-43f1-ac30-c86448d17e09
+		summarizeBy: none
+		sourceColumn: banner_id
+
+	column banner_name
+		dataType: string
+		lineageTag: bb04b325-d0d8-4ce7-8be3-3a6ba1777e26
+		summarizeBy: none
+		sourceColumn: banner_name
+
+	column banner_category
+		dataType: string
+		lineageTag: fffa6520-a214-45f0-a7e4-595da6d89dc3
+		summarizeBy: none
+		sourceColumn: banner_category
+
+	column banner_positioning
+		dataType: string
+		lineageTag: 18e10f40-2229-4a31-be6d-c0c69bc2d839
+		summarizeBy: none
+		sourceColumn: banner_positioning
+
+	column parent_company
+		dataType: string
+		lineageTag: 047d29fa-f6d9-47c2-b9af-f6e6820deb65
+		summarizeBy: none
+		sourceColumn: parent_company
+
+	column launch_year
+		dataType: int64
+		lineageTag: f274a88b-f622-4eef-b1d9-ae18991cf01d
+		summarizeBy: none
+		sourceColumn: launch_year
+
+	partition dim_banner = entity
+		mode: directLake
+		source
+			entityName: dim_banner
+			schemaName: gold
+			expressionSource: DatabaseQuery
+

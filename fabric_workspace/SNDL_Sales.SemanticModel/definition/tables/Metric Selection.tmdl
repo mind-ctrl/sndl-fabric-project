@@ -1,0 +1,58 @@
+/// Field parameter — lets a report user swap the active metric on a visual.
+/// A calculated table (import); valid in the composite Direct Lake + Import model.
+table 'Metric Selection'
+	lineageTag: 3c4d5e6f-0001-4a00-9000-000000000003
+
+	column Metric
+		dataType: string
+		lineageTag: 3c4d5e6f-0002-4a00-9000-000000000003
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Metric Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+	column 'Metric Fields'
+		dataType: string
+		isHidden
+		lineageTag: 3c4d5e6f-0003-4a00-9000-000000000003
+		summarizeBy: none
+		sourceColumn: [Value2]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+	column 'Metric Order'
+		dataType: int64
+		isHidden
+		lineageTag: 3c4d5e6f-0004-4a00-9000-000000000003
+		summarizeBy: none
+		sourceColumn: [Value3]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+	partition 'Metric Selection' = calculated
+		mode: import
+		source =
+				{
+				    ("Net Sales", NAMEOF('_Measures'[Net Sales]), 0),
+				    ("Gross Margin", NAMEOF('_Measures'[Gross Margin]), 1),
+				    ("Gross Margin %", NAMEOF('_Measures'[Gross Margin %]), 2),
+				    ("Total Transactions", NAMEOF('_Measures'[Total Transactions]), 3),
+				    ("Avg Transaction Value", NAMEOF('_Measures'[Avg Transaction Value]), 4),
+				    ("Units per Transaction", NAMEOF('_Measures'[Units per Transaction]), 5),
+				    ("Active Customers", NAMEOF('_Measures'[Active Customers]), 6),
+				    ("Own-Brand Mix %", NAMEOF('_Measures'[Own-Brand Mix %]), 7)
+				}
+

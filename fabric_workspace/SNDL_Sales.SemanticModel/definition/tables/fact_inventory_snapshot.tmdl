@@ -1,0 +1,94 @@
+table fact_inventory_snapshot
+	lineageTag: a7914335-f62d-4972-a496-042b8f463509
+
+	column snapshot_id
+		dataType: int64
+		isHidden
+		lineageTag: 52e11326-955d-41d9-841c-b4b4891457d2
+		summarizeBy: none
+		sourceColumn: snapshot_id
+
+	column snapshot_date_id
+		dataType: int64
+		isHidden
+		lineageTag: 27092f74-ae9e-4ea5-81ba-cfefd02d034e
+		summarizeBy: none
+		sourceColumn: snapshot_date_id
+
+	column store_id
+		dataType: int64
+		isHidden
+		lineageTag: 6b06308a-d893-4963-84e2-650dbd46dac3
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column product_id
+		dataType: int64
+		isHidden
+		lineageTag: 9aa84fa4-5822-431e-bba7-a23959c52b19
+		summarizeBy: none
+		sourceColumn: product_id
+
+	column on_hand_units
+		dataType: int64
+		lineageTag: d97a4ad7-f087-4c56-8705-efc1dced68b6
+		summarizeBy: none
+		sourceColumn: on_hand_units
+
+	column on_order_units
+		dataType: int64
+		lineageTag: 0d9328c5-12a9-4a30-8cec-57977e520b78
+		summarizeBy: none
+		sourceColumn: on_order_units
+
+	column unit_cost_cad
+		dataType: double
+		lineageTag: 41ce95ea-fb16-4c63-b677-d52ee349fe9a
+		summarizeBy: none
+		sourceColumn: unit_cost_cad
+
+	column inventory_value_cad
+		dataType: double
+		lineageTag: 5245f89e-e327-4856-a086-245aa57ffda7
+		summarizeBy: none
+		sourceColumn: inventory_value_cad
+
+	column days_of_supply
+		dataType: int64
+		lineageTag: 8b6422d0-3d8a-4915-bdc8-1e02a32576bb
+		summarizeBy: none
+		sourceColumn: days_of_supply
+
+	column is_out_of_stock
+		dataType: int64
+		lineageTag: 0741f1ed-b799-4885-b4bb-ab503ffb6cb4
+		summarizeBy: none
+		sourceColumn: is_out_of_stock
+
+	column is_overstocked
+		dataType: int64
+		lineageTag: 3adc6d72-6ace-4b23-b081-82abacd19288
+		summarizeBy: none
+		sourceColumn: is_overstocked
+
+	column store_sk
+		dataType: int64
+		isHidden
+		lineageTag: 03ea5ce4-459e-4283-bf0a-c9c481b31895
+		summarizeBy: none
+		sourceColumn: store_sk
+
+	column product_sk
+		dataType: int64
+		isHidden
+		lineageTag: f669c6cc-decf-4459-98d0-eb0fb438d492
+		summarizeBy: none
+		sourceColumn: product_sk
+
+	partition fact_inventory_snapshot = entity
+		mode: directLake
+		source
+			entityName: fact_inventory_snapshot
+			schemaName: gold
+			expressionSource: DatabaseQuery
+

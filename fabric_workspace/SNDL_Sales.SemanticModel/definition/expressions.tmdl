@@ -1,0 +1,18 @@
+/// Direct Lake source — the Gold Warehouse / Lakehouse SQL endpoint.
+/// The server + database below are STAGE-SPECIFIC and are repointed per stage by a
+/// Fabric deployment-pipeline rule ("Direct Lake semantic-model source repointing"),
+/// so Dev/Test/Prod each bind to their own Gold endpoint. Never hardcode a single
+/// workspace's endpoint as the only source.
+expression DatabaseQuery =
+		let
+		    Source = AzureStorage.DataLake("https://onelake.dfs.fabric.microsoft.com/d46401cf-3418-406f-81b0-7912336d9363/9a853918-e7e4-48c6-9d75-02661432c95a")
+		in
+		    Source
+	lineageTag: 5b0f7f2a-9d3e-4a11-bb44-0d2a1f6c7e90
+
+expression GoldSqlEndpoint = "zeyfovqmkvvepip2mxkdv3hxrq-z4awjvaygrxubanqpejdg3mtmm.datawarehouse.fabric.microsoft.com" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 7c2a9b18-3e54-4d22-9a6b-1f0e2d3c4b5a
+
+expression GoldDatabase = "LH_SNDL" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 9e1d4c33-6a72-4b88-8c0d-2b3a4c5d6e7f
+

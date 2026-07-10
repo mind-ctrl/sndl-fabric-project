@@ -1,0 +1,128 @@
+table fact_sales_line_item
+	lineageTag: 7fd53fd0-2b69-4213-ba94-eeba24c9494a
+
+	column line_item_id
+		dataType: int64
+		isHidden
+		lineageTag: 4c8f11df-3250-49bc-b38e-65330a23169b
+		summarizeBy: none
+		sourceColumn: line_item_id
+
+	column transaction_id
+		dataType: int64
+		isHidden
+		lineageTag: ea75dffc-627f-4d58-bc7f-2f07d9a51c36
+		summarizeBy: none
+		sourceColumn: transaction_id
+
+	column transaction_date_id
+		dataType: int64
+		isHidden
+		lineageTag: 592228c9-5b51-459c-b897-5da4742d22a5
+		summarizeBy: none
+		sourceColumn: transaction_date_id
+
+	column store_id
+		dataType: int64
+		isHidden
+		lineageTag: a8107de3-7152-47ba-9344-565d74084bee
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column customer_id
+		dataType: int64
+		isHidden
+		lineageTag: 18239599-69c2-4aab-a021-6a7417d5d7c9
+		summarizeBy: none
+		sourceColumn: customer_id
+
+	column product_id
+		dataType: int64
+		isHidden
+		lineageTag: b317ab2d-233d-4dc9-b049-f21a8676b12f
+		summarizeBy: none
+		sourceColumn: product_id
+
+	column line_number
+		dataType: int64
+		lineageTag: 28f1679e-6af5-4cc6-b57a-219a666e99f4
+		summarizeBy: none
+		sourceColumn: line_number
+
+	column quantity
+		dataType: int64
+		lineageTag: abe3be82-e7a3-48ad-9767-ecf4eb5b04e8
+		summarizeBy: none
+		sourceColumn: quantity
+
+	column unit_list_price_cad
+		dataType: double
+		lineageTag: 49ead52d-ecbf-453e-ab4d-3ed970112e2e
+		summarizeBy: none
+		sourceColumn: unit_list_price_cad
+
+	column unit_discount_cad
+		dataType: double
+		lineageTag: 471d7181-b822-4c3d-8c6d-dccaf78ee94a
+		summarizeBy: none
+		sourceColumn: unit_discount_cad
+
+	column unit_net_price_cad
+		dataType: double
+		lineageTag: c8ab86a7-6570-494f-b468-7b484cdd9d4a
+		summarizeBy: none
+		sourceColumn: unit_net_price_cad
+
+	column line_subtotal_cad
+		dataType: double
+		lineageTag: 216ce538-676c-4b2c-b5d2-3cadd0ad311e
+		summarizeBy: none
+		sourceColumn: line_subtotal_cad
+
+	column line_cost_cad
+		dataType: double
+		lineageTag: 803f2a91-5f52-4a17-97f5-4f29fa2a1626
+		summarizeBy: none
+		sourceColumn: line_cost_cad
+
+	column line_margin_cad
+		dataType: double
+		lineageTag: 4c8da3b0-7e9d-4a55-94e1-bff18eb1fd99
+		summarizeBy: none
+		sourceColumn: line_margin_cad
+
+	column promotion_id
+		dataType: int64
+		isHidden
+		lineageTag: c2cc8bbb-4555-418a-a53f-e8090406d8de
+		summarizeBy: none
+		sourceColumn: promotion_id
+
+	column store_sk
+		dataType: int64
+		isHidden
+		lineageTag: fd0e5882-33b8-447b-8066-1db4b0922b9f
+		summarizeBy: none
+		sourceColumn: store_sk
+
+	column product_sk
+		dataType: int64
+		isHidden
+		lineageTag: f7e6e944-5aea-4f0a-907f-5db9bfe2cc05
+		summarizeBy: none
+		sourceColumn: product_sk
+
+	column customer_sk
+		dataType: int64
+		isHidden
+		lineageTag: 2ef523a6-2f97-40e9-b861-0189a36bb9d5
+		summarizeBy: none
+		sourceColumn: customer_sk
+
+	partition fact_sales_line_item = entity
+		mode: directLake
+		source
+			entityName: fact_sales_line_item
+			schemaName: gold
+			expressionSource: DatabaseQuery
+

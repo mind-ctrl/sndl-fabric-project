@@ -1,0 +1,108 @@
+table dim_date
+	lineageTag: 4d937cec-cdbe-4191-ac80-112e310691e7
+
+	column date_id
+		dataType: int64
+		lineageTag: e03986a7-0260-4b68-b5c1-c3d8b0423985
+		summarizeBy: none
+		sourceColumn: date_id
+
+	column date
+		dataType: dateTime
+		lineageTag: cc56e284-7e00-4a2f-9471-0cda144f8e96
+		summarizeBy: none
+		sourceColumn: date
+
+	column day_of_week
+		dataType: int64
+		lineageTag: 04c2e7a8-68a3-437a-b725-a5bf6ae840f3
+		summarizeBy: none
+		sourceColumn: day_of_week
+
+	column day_of_week_name
+		dataType: string
+		lineageTag: 27402c20-80d6-48fc-8a74-f033726b7d55
+		summarizeBy: none
+		sourceColumn: day_of_week_name
+		sortByColumn: day_of_week
+
+	column day_of_month
+		dataType: int64
+		lineageTag: f3870853-5dc5-4247-a864-599942da206c
+		summarizeBy: none
+		sourceColumn: day_of_month
+
+	column week_of_year
+		dataType: int64
+		lineageTag: 681fa5d5-db08-4aa5-ab3f-766516e3a5e6
+		summarizeBy: none
+		sourceColumn: week_of_year
+
+	column month_of_year
+		dataType: int64
+		lineageTag: b954255d-eecb-4cb4-999d-860ee2d1d1f4
+		summarizeBy: none
+		sourceColumn: month_of_year
+
+	column month_name
+		dataType: string
+		lineageTag: cf39c1cf-5feb-4be7-9d94-3f609c0a3820
+		summarizeBy: none
+		sourceColumn: month_name
+		sortByColumn: month_of_year
+
+	column quarter
+		dataType: int64
+		lineageTag: 4cf6b639-3e8e-4835-9586-eb612ae9d353
+		summarizeBy: none
+		sourceColumn: quarter
+
+	column calendar_year
+		dataType: int64
+		lineageTag: 31c6d93b-f887-4c72-b631-cff6cf8b82d7
+		summarizeBy: none
+		sourceColumn: calendar_year
+
+	column fiscal_year
+		dataType: int64
+		lineageTag: 653c4ae9-fb46-4642-9c6b-58cf826741d9
+		summarizeBy: none
+		sourceColumn: fiscal_year
+
+	column fiscal_quarter
+		dataType: string
+		lineageTag: c27d68b5-65cc-4524-a231-be524d0f3d19
+		summarizeBy: none
+		sourceColumn: fiscal_quarter
+
+	column is_weekend
+		dataType: int64
+		lineageTag: 671cdd83-134a-4664-a729-5d1153841de1
+		summarizeBy: none
+		sourceColumn: is_weekend
+
+	column is_canadian_holiday
+		dataType: int64
+		lineageTag: d97c7bb7-961c-42e5-b376-25d08be4726d
+		summarizeBy: none
+		sourceColumn: is_canadian_holiday
+
+	column holiday_name
+		dataType: string
+		lineageTag: 6337e37c-b563-4a52-af17-e2041c90cfbb
+		summarizeBy: none
+		sourceColumn: holiday_name
+
+	column is_payday_friday
+		dataType: int64
+		lineageTag: 1d679d61-924b-49da-86ac-26756d862323
+		summarizeBy: none
+		sourceColumn: is_payday_friday
+
+	partition dim_date = entity
+		mode: directLake
+		source
+			entityName: dim_date
+			schemaName: gold
+			expressionSource: DatabaseQuery
+

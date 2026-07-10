@@ -1,0 +1,7 @@
+/// Row-level security — restricts a user to the cannabis banners. Filtering
+/// dim_banner propagates through dim_store to every fact.
+role 'RLS Cannabis Banners'
+	modelPermission: read
+
+	tablePermission dim_banner = dim_banner[banner_category] = "Cannabis"
+

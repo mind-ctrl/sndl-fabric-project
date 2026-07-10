@@ -1,0 +1,527 @@
+/// Measure host table. Implemented as a tiny import table so the model is a
+/// composite Direct Lake + Import model (lets us host measures, a calc group, and
+/// a field parameter alongside the Direct Lake Gold tables). All measures are
+/// validated against sndl_synthetic_data/06_kpi_validation reference values.
+table _Measures
+	lineageTag: 1a2b3c4d-0001-4a00-9000-000000000001
+
+	measure 'Net Sales' = SUM(fact_sales_line_item[line_subtotal_cad])
+		formatString: \$#,0
+		displayFolder: 01 Sales
+		lineageTag: 1a2b3c4d-1001-4a00-9000-000000000001
+
+	measure 'Total Cost' = SUM(fact_sales_line_item[line_cost_cad])
+		formatString: \$#,0
+		displayFolder: 01 Sales
+		lineageTag: 1a2b3c4d-1002-4a00-9000-000000000001
+
+	measure 'Gross Margin' = [Net Sales] - [Total Cost]
+		formatString: \$#,0
+		displayFolder: 01 Sales
+		lineageTag: 1a2b3c4d-1003-4a00-9000-000000000001
+
+	measure 'Gross Margin %' = DIVIDE([Gross Margin], [Net Sales])
+		formatString: 0.0%
+		displayFolder: 01 Sales
+		lineageTag: 1a2b3c4d-1004-4a00-9000-000000000001
+
+	measure 'Total Revenue (incl tax)' = SUM(fact_sales_transaction[total_amount_cad])
+		formatString: \$#,0
+		displayFolder: 01 Sales
+		lineageTag: 1a2b3c4d-1005-4a00-9000-000000000001
+
+	measure 'Total Transactions' = DISTINCTCOUNT(fact_sales_transaction[transaction_id])
+		formatString: #,0
+		displayFolder: 01 Sales
+		lineageTag: 1a2b3c4d-1006-4a00-9000-000000000001
+
+	measure 'Total Units' = SUM(fact_sales_line_item[quantity])
+		formatString: #,0
+		displayFolder: 01 Sales
+		lineageTag: 1a2b3c4d-1007-4a00-9000-000000000001
+
+	measure 'Avg Transaction Value' = DIVIDE([Total Revenue (incl tax)], [Total Transactions])
+		formatString: \$#,0.00
+		displayFolder: 01 Sales
+		lineageTag: 1a2b3c4d-1008-4a00-9000-000000000001
+
+	measure 'Units per Transaction' = DIVIDE([Total Units], [Total Transactions])
+		formatString: 0.00
+		displayFolder: 01 Sales
+		lineageTag: 1a2b3c4d-1009-4a00-9000-000000000001
+
+	/// Net Sales restricted to comparable stores: stores with sales in both the current period and the same period last year. BLANK when no prior-year period exists in context.
+	measure 'Same-Store Sales' =
+			VAR _currStores = VALUES('fact_sales_line_item'[store_sk])
+			VAR _priorStores =
+			    CALCULATETABLE(
+			        VALUES('fact_sales_line_item'[store_sk]),
+			        DATEADD('dim_date'[date], -1, YEAR)
+			    )
+			RETURN
+			    CALCULATE([Net Sales], KEEPFILTERS(INTERSECT(_currStores, _priorStores)))
+		formatString: \$#,0
+		displayFolder: 01 Sales
+		lineageTag: 1a2b3c4d-1010-4a00-9000-000000000001
+
+	/// Distinct identified customers with at least one transaction. Excludes guest (blank) checkouts.
+	measure 'Active Customers' = DISTINCTCOUNTNOBLANK(fact_sales_transaction[customer_id])
+		formatString: #,0
+		displayFolder: 02 Customer & Loyalty
+		lineageTag: 1a2b3c4d-2001-4a00-9000-000000000001
+
+	measure 'Loyalty Transactions' = CALCULATE([Total Transactions], fact_sales_transaction[is_loyalty_transaction] = 1)
+		formatString: #,0
+		displayFolder: 02 Customer & Loyalty
+		lineageTag: 1a2b3c4d-2002-4a00-9000-000000000001
+
+	measure 'Loyalty Transaction %' = DIVIDE([Loyalty Transactions], [Total Transactions])
+		formatString: 0.0%
+		displayFolder: 02 Customer & Loyalty
+		lineageTag: 1a2b3c4d-2003-4a00-9000-000000000001
+
+	measure 'Loyalty Members' = DISTINCTCOUNT(dim_customer[customer_business_key])
+		formatString: #,0
+		displayFolder: 02 Customer & Loyalty
+		lineageTag: 1a2b3c4d-2004-4a00-9000-000000000001
+
+	measure 'Points Earned' = CALCULATE(SUM(fact_loyalty_event[points_delta]), fact_loyalty_event[points_delta] > 0)
+		formatString: #,0
+		displayFolder: 02 Customer & Loyalty
+		lineageTag: 1a2b3c4d-2005-4a00-9000-000000000001
+
+	measure 'Points Redeemed' = -1 * CALCULATE(SUM(fact_loyalty_event[points_delta]), fact_loyalty_event[points_delta] < 0)
+		formatString: #,0
+		displayFolder: 02 Customer & Loyalty
+		lineageTag: 1a2b3c4d-2006-4a00-9000-000000000001
+
+	measure 'Redemption Rate' = DIVIDE([Points Redeemed], [Points Earned])
+		formatString: 0.0%
+		displayFolder: 02 Customer & Loyalty
+		lineageTag: 1a2b3c4d-2007-4a00-9000-000000000001
+
+	measure 'Avg Customer Lifetime Spend' = AVERAGE(dim_customer[lifetime_spend_cad])
+		formatString: \$#,0
+		displayFolder: 02 Customer & Loyalty
+		lineageTag: 1a2b3c4d-2008-4a00-9000-000000000001
+
+	measure 'SNDL Own-Brand Sales' = CALCULATE([Net Sales], dim_product[is_sndl_own_brand] = 1)
+		formatString: \$#,0
+		displayFolder: 03 Product & Brand
+		lineageTag: 1a2b3c4d-3001-4a00-9000-000000000001
+
+	measure 'Own-Brand Mix %' = DIVIDE([SNDL Own-Brand Sales], [Net Sales])
+		formatString: 0.0%
+		displayFolder: 03 Product & Brand
+		lineageTag: 1a2b3c4d-3002-4a00-9000-000000000001
+
+	measure 'Distinct SKUs Sold' = DISTINCTCOUNT(fact_sales_line_item[product_id])
+		formatString: #,0
+		displayFolder: 03 Product & Brand
+		lineageTag: 1a2b3c4d-3003-4a00-9000-000000000001
+
+	measure 'Discount Amount' = SUMX(fact_sales_line_item, fact_sales_line_item[quantity] * fact_sales_line_item[unit_discount_cad])
+		formatString: \$#,0
+		displayFolder: 04 Pricing & Promo
+		lineageTag: 1a2b3c4d-4001-4a00-9000-000000000001
+
+	measure 'Promo Sales' = CALCULATE([Net Sales], NOT(ISBLANK(fact_sales_line_item[promotion_id])))
+		formatString: \$#,0
+		displayFolder: 04 Pricing & Promo
+		lineageTag: 1a2b3c4d-4002-4a00-9000-000000000001
+
+	measure 'Markdown Rate' = DIVIDE([Discount Amount], [Net Sales] + [Discount Amount])
+		formatString: 0.0%
+		displayFolder: 04 Pricing & Promo
+		lineageTag: 1a2b3c4d-4003-4a00-9000-000000000001
+
+	measure 'On-Hand Units' = SUM(fact_inventory_snapshot[on_hand_units])
+		formatString: #,0
+		displayFolder: 05 Inventory
+		lineageTag: 1a2b3c4d-5001-4a00-9000-000000000001
+
+	/// Point-in-time inventory value at the latest snapshot in the current filter context.
+	/// Semi-additive: the inventory fact holds ~weekly snapshots, so a plain SUM would
+	/// add every snapshot date together and overstate stock ~100x. We take the value at
+	/// MAX(snapshot_date_id) instead (respects any dim_date filter via the date relationship).
+	measure 'Inventory Value' =
+			VAR _lastSnap = MAX(fact_inventory_snapshot[snapshot_date_id])
+			RETURN
+				CALCULATE(
+					SUM(fact_inventory_snapshot[inventory_value_cad]),
+					fact_inventory_snapshot[snapshot_date_id] = _lastSnap
+				)
+		formatString: \$#,0
+		displayFolder: 05 Inventory
+		lineageTag: 1a2b3c4d-5002-4a00-9000-000000000001
+
+	measure 'Out-of-Stock Rate' = DIVIDE(CALCULATE(COUNTROWS(fact_inventory_snapshot), fact_inventory_snapshot[is_out_of_stock] = 1), COUNTROWS(fact_inventory_snapshot))
+		formatString: 0.0%
+		displayFolder: 05 Inventory
+		lineageTag: 1a2b3c4d-5003-4a00-9000-000000000001
+
+	measure 'Avg Days of Supply' = AVERAGE(fact_inventory_snapshot[days_of_supply])
+		formatString: 0.0
+		displayFolder: 05 Inventory
+		lineageTag: 1a2b3c4d-5004-4a00-9000-000000000001
+
+	/// Net Sales growth vs the same period last year.
+	measure 'Net Sales YoY %' =
+			VAR _py = CALCULATE([Net Sales], DATEADD('dim_date'[date], -1, YEAR))
+			RETURN DIVIDE([Net Sales] - _py, _py)
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 06 vs Prior Year
+		lineageTag: 1a2b3c4d-6001-4a00-9000-000000000001
+
+	/// Gross margin percentage-point change vs the same period last year.
+	measure 'Gross Margin % Δ vs PY' =
+			VAR _py = CALCULATE([Gross Margin %], DATEADD('dim_date'[date], -1, YEAR))
+			RETURN IF(NOT ISBLANK(_py), ([Gross Margin %] - _py) * 100)
+		formatString: +0.0 \p\t\s;-0.0 \p\t\s
+		displayFolder: 06 vs Prior Year
+		lineageTag: 1a2b3c4d-6002-4a00-9000-000000000001
+
+	/// Transaction count growth vs the same period last year.
+	measure 'Transactions YoY %' =
+			VAR _py = CALCULATE([Total Transactions], DATEADD('dim_date'[date], -1, YEAR))
+			RETURN DIVIDE([Total Transactions] - _py, _py)
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 06 vs Prior Year
+		lineageTag: 1a2b3c4d-6003-4a00-9000-000000000001
+
+	/// Average basket value growth vs the same period last year.
+	measure 'Avg Transaction Value YoY %' =
+			VAR _py = CALCULATE([Avg Transaction Value], DATEADD('dim_date'[date], -1, YEAR))
+			RETURN DIVIDE([Avg Transaction Value] - _py, _py)
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 06 vs Prior Year
+		lineageTag: 1a2b3c4d-6004-4a00-9000-000000000001
+
+	/// Loyalty penetration percentage-point change vs the same period last year.
+	measure 'Loyalty Penetration Δ vs PY' =
+			VAR _py = CALCULATE([Loyalty Transaction %], DATEADD('dim_date'[date], -1, YEAR))
+			RETURN IF(NOT ISBLANK(_py), ([Loyalty Transaction %] - _py) * 100)
+		formatString: +0.0 \p\t\s;-0.0 \p\t\s
+		displayFolder: 06 vs Prior Year
+		lineageTag: 1a2b3c4d-6005-4a00-9000-000000000001
+
+	/// Units-per-transaction growth vs the same period last year.
+	measure 'Units per Transaction YoY %' =
+			VAR _py = CALCULATE([Units per Transaction], DATEADD('dim_date'[date], -1, YEAR))
+			RETURN DIVIDE([Units per Transaction] - _py, _py)
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 06 vs Prior Year
+		lineageTag: 1a2b3c4d-6006-4a00-9000-000000000001
+
+	/// Comparable-store growth: sales of stores trading in both periods, current vs prior year.
+	measure 'Same-Store Sales Growth %' =
+			VAR _currStores = VALUES('fact_sales_line_item'[store_sk])
+			VAR _priorStores =
+			    CALCULATETABLE(
+			        VALUES('fact_sales_line_item'[store_sk]),
+			        DATEADD('dim_date'[date], -1, YEAR)
+			    )
+			VAR _both = INTERSECT(_currStores, _priorStores)
+			VAR _curr = CALCULATE([Net Sales], KEEPFILTERS(_both))
+			VAR _prior =
+			    CALCULATE(
+			        [Net Sales],
+			        DATEADD('dim_date'[date], -1, YEAR),
+			        KEEPFILTERS(_both)
+			    )
+			RETURN DIVIDE(_curr - _prior, _prior)
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 01 Sales
+		lineageTag: 1a2b3c4d-6007-4a00-9000-000000000001
+
+	/// Header label showing when the model was last processed.
+	measure 'Last Refreshed Label' = "Last refreshed: " & FORMAT(MAX('_RefreshLog'[RefreshedAt]), "mmm d, yyyy h:nn AM/PM")
+		displayFolder: 00 Header
+		lineageTag: 1a2b3c4d-6008-4a00-9000-000000000001
+
+	/// Dense rank of the selected banner by Net Sales, respecting other slicers (ALLSELECTED). Blank at totals.
+	measure 'Sales Rank by Banner' =
+			IF(
+			    HASONEVALUE('dim_store'[banner_name]),
+			    RANKX(ALLSELECTED('dim_store'[banner_name]), [Net Sales], , DESC, Dense)
+			)
+		formatString: #,0
+		displayFolder: 07 Advanced
+		lineageTag: 1a2b3c4d-7001-4a00-9000-000000000001
+
+	/// Net Sales over the trailing 3 calendar months ending at the last date in the current context.
+	measure 'Rolling 3M Net Sales' =
+			CALCULATE(
+			    [Net Sales],
+			    DATESINPERIOD('dim_date'[date], MAX('dim_date'[date]), -3, MONTH)
+			)
+		formatString: \$#,0
+		displayFolder: 07 Advanced
+		lineageTag: 1a2b3c4d-7002-4a00-9000-000000000001
+
+	/// Share of Net Sales within the product's own category. Slice visuals by dim_product[category_name] — ALLEXCEPT does not release dim_category filters arriving via the snowflake.
+	measure 'Category Share %' =
+			DIVIDE(
+			    [Net Sales],
+			    CALCULATE([Net Sales], ALLEXCEPT('dim_product', 'dim_product'[category_name]))
+			)
+		formatString: 0.0%
+		displayFolder: 07 Advanced
+		lineageTag: 1a2b3c4d-7003-4a00-9000-000000000001
+
+	/// Net Sales restricted to the Top N products by Net Sales; N from the 'Top N' what-if slicer (default 10). Ties can return more than N products.
+	measure 'Top N SKU Sales' =
+			VAR N = SELECTEDVALUE('Top N'[Top N], 10)
+			RETURN
+			    CALCULATE(
+			        [Net Sales],
+			        KEEPFILTERS(TOPN(N, VALUES('dim_product'[product_name]), [Net Sales], DESC))
+			    )
+		formatString: \$#,0
+		displayFolder: 07 Advanced
+		lineageTag: 1a2b3c4d-7004-4a00-9000-000000000001
+
+	/// Dynamic title for Top-N visuals.
+	measure 'Top N Title' = "Top " & SELECTEDVALUE('Top N'[Top N], 10) & " SKUs by Net Sales"
+		displayFolder: 07 Advanced
+		lineageTag: 1a2b3c4d-7005-4a00-9000-000000000001
+
+	/// Cumulative share of Net Sales for products ranked at or above the current one (Pareto / 80-20 curve). Quadratic cost — use on a Pareto line visual, not large tables.
+	measure 'Running Net Sales %' =
+			VAR _allProducts = ALLSELECTED('dim_product'[product_name])
+			VAR _thisSales = [Net Sales]
+			VAR _cumulative =
+			    SUMX(FILTER(_allProducts, [Net Sales] >= _thisSales), [Net Sales])
+			RETURN
+			    DIVIDE(_cumulative, CALCULATE([Net Sales], _allProducts))
+		formatString: 0.0%
+		displayFolder: 07 Advanced
+		lineageTag: 1a2b3c4d-7008-4a00-9000-000000000001
+
+	/// Gross list-price revenue (qty x unit list price), before any discount. Basis for the margin bridge price effect.
+	measure 'List Amount' = SUMX ( 'fact_sales_line_item', 'fact_sales_line_item'[quantity] * 'fact_sales_line_item'[unit_list_price_cad] )
+		formatString: \$#,0
+		displayFolder: 08 Margin Bridge
+		lineageTag: 1a2b3c4d-8001-4a00-9000-000000000001
+
+	/// Gross Margin for the same period last year.
+	measure 'GM PY' = CALCULATE ( [Gross Margin], DATEADD ( 'dim_date'[date], -1, YEAR ) )
+		formatString: \$#,0
+		displayFolder: 08 Margin Bridge
+		lineageTag: 1a2b3c4d-8002-4a00-9000-000000000001
+
+	/// Margin bridge: effect of total unit-volume change at PY blended margin rate. (Q2-Q1)/Q1 x GM1.
+	measure 'GM Volume Effect' =
+			VAR _Q1 = CALCULATE ( SUM ( 'fact_sales_line_item'[quantity] ), DATEADD ( 'dim_date'[date], -1, YEAR ) )
+			VAR _GM1 = [GM PY]
+			VAR _Q2 = SUM ( 'fact_sales_line_item'[quantity] )
+			RETURN IF ( NOT ISBLANK ( _Q1 ), DIVIDE ( _Q2 - _Q1, _Q1 ) * _GM1 )
+		formatString: \$#,0
+		displayFolder: 08 Margin Bridge
+		lineageTag: 1a2b3c4d-8003-4a00-9000-000000000001
+
+	/// Margin bridge: effect of product-mix shift at PY unit margins (new products carry zero PY rate by convention).
+	measure 'GM Mix Effect' =
+			VAR _t =
+			    ADDCOLUMNS (
+			        VALUES ( 'dim_product'[product_sk] ),
+			        "@q1", COALESCE ( CALCULATE ( SUM ( 'fact_sales_line_item'[quantity] ), DATEADD ( 'dim_date'[date], -1, YEAR ) ), 0 ),
+			        "@q2", COALESCE ( CALCULATE ( SUM ( 'fact_sales_line_item'[quantity] ) ), 0 ),
+			        "@m1u",
+			            VAR _q = CALCULATE ( SUM ( 'fact_sales_line_item'[quantity] ), DATEADD ( 'dim_date'[date], -1, YEAR ) )
+			            VAR _m = CALCULATE ( [Gross Margin], DATEADD ( 'dim_date'[date], -1, YEAR ) )
+			            RETURN COALESCE ( DIVIDE ( _m, _q ), 0 )
+			    )
+			VAR _Q1 = SUMX ( _t, [@q1] )
+			VAR _Q2 = SUMX ( _t, [@q2] )
+			RETURN IF ( _Q1 > 0, SUMX ( _t, ( [@q2] - [@q1] * DIVIDE ( _Q2, _Q1 ) ) * [@m1u] ) )
+		formatString: \$#,0
+		displayFolder: 08 Margin Bridge
+		lineageTag: 1a2b3c4d-8004-4a00-9000-000000000001
+
+	/// Margin bridge: effect of list-price changes at CY volumes. Sum over products of q2 x (unit list CY - unit list PY).
+	measure 'GM Price Effect' =
+			VAR _t =
+			    ADDCOLUMNS (
+			        VALUES ( 'dim_product'[product_sk] ),
+			        "@q2", COALESCE ( CALCULATE ( SUM ( 'fact_sales_line_item'[quantity] ) ), 0 ),
+			        "@u2", COALESCE ( DIVIDE ( CALCULATE ( [List Amount] ), CALCULATE ( SUM ( 'fact_sales_line_item'[quantity] ) ) ), 0 ),
+			        "@u1", COALESCE ( DIVIDE ( CALCULATE ( [List Amount], DATEADD ( 'dim_date'[date], -1, YEAR ) ), CALCULATE ( SUM ( 'fact_sales_line_item'[quantity] ), DATEADD ( 'dim_date'[date], -1, YEAR ) ) ), 0 )
+			    )
+			RETURN IF ( NOT ISBLANK ( [GM PY] ), SUMX ( _t, [@q2] * ( [@u2] - [@u1] ) ) )
+		formatString: \$#,0
+		displayFolder: 08 Margin Bridge
+		lineageTag: 1a2b3c4d-8005-4a00-9000-000000000001
+
+	/// Margin bridge: effect of markdown/discount-rate changes at CY volumes (deeper discounting reduces margin).
+	measure 'GM Markdown Effect' =
+			VAR _t =
+			    ADDCOLUMNS (
+			        VALUES ( 'dim_product'[product_sk] ),
+			        "@q2", COALESCE ( CALCULATE ( SUM ( 'fact_sales_line_item'[quantity] ) ), 0 ),
+			        "@u2", COALESCE ( DIVIDE ( CALCULATE ( [Discount Amount] ), CALCULATE ( SUM ( 'fact_sales_line_item'[quantity] ) ) ), 0 ),
+			        "@u1", COALESCE ( DIVIDE ( CALCULATE ( [Discount Amount], DATEADD ( 'dim_date'[date], -1, YEAR ) ), CALCULATE ( SUM ( 'fact_sales_line_item'[quantity] ), DATEADD ( 'dim_date'[date], -1, YEAR ) ) ), 0 )
+			    )
+			RETURN IF ( NOT ISBLANK ( [GM PY] ), - SUMX ( _t, [@q2] * ( [@u2] - [@u1] ) ) )
+		formatString: \$#,0
+		displayFolder: 08 Margin Bridge
+		lineageTag: 1a2b3c4d-8006-4a00-9000-000000000001
+
+	/// Margin bridge: effect of unit-cost changes at CY volumes (higher cost reduces margin).
+	measure 'GM Cost Effect' =
+			VAR _t =
+			    ADDCOLUMNS (
+			        VALUES ( 'dim_product'[product_sk] ),
+			        "@q2", COALESCE ( CALCULATE ( SUM ( 'fact_sales_line_item'[quantity] ) ), 0 ),
+			        "@u2", COALESCE ( DIVIDE ( CALCULATE ( [Total Cost] ), CALCULATE ( SUM ( 'fact_sales_line_item'[quantity] ) ) ), 0 ),
+			        "@u1", COALESCE ( DIVIDE ( CALCULATE ( [Total Cost], DATEADD ( 'dim_date'[date], -1, YEAR ) ), CALCULATE ( SUM ( 'fact_sales_line_item'[quantity] ), DATEADD ( 'dim_date'[date], -1, YEAR ) ) ), 0 )
+			    )
+			RETURN IF ( NOT ISBLANK ( [GM PY] ), - SUMX ( _t, [@q2] * ( [@u2] - [@u1] ) ) )
+		formatString: \$#,0
+		displayFolder: 08 Margin Bridge
+		lineageTag: 1a2b3c4d-8007-4a00-9000-000000000001
+
+	/// Bridge driver for the waterfall visual: routes each 'GM Bridge Steps' row to its effect measure.
+	measure 'GM Bridge Value' =
+			SWITCH (
+			    SELECTEDVALUE ( 'GM Bridge Steps'[Step] ),
+			    "GM PY", [GM PY],
+			    "Volume", [GM Volume Effect],
+			    "Mix", [GM Mix Effect],
+			    "Price", [GM Price Effect],
+			    "Markdown", [GM Markdown Effect],
+			    "Cost", [GM Cost Effect],
+			    BLANK ()
+			)
+		formatString: \$#,0
+		displayFolder: 08 Margin Bridge
+		lineageTag: 1a2b3c4d-8008-4a00-9000-000000000001
+
+	/// Reconciliation check: GM CY minus (GM PY + all bridge effects). Must be ~0; non-zero means the decomposition broke.
+	measure 'GM Bridge Check' = [Gross Margin] - [GM PY] - [GM Volume Effect] - [GM Mix Effect] - [GM Price Effect] - [GM Markdown Effect] - [GM Cost Effect]
+		formatString: \$#,0.00
+		isHidden
+		displayFolder: 08 Margin Bridge
+		lineageTag: 1a2b3c4d-8009-4a00-9000-000000000001
+
+	/// Share of loyalty members who shop both cannabis and liquor banners.
+	measure 'Cross-Shop %' = DIVIDE ( CALCULATE ( [Loyalty Members], 'dim_customer'[is_cross_category] = 1 ), [Loyalty Members] )
+		formatString: 0.0%
+		displayFolder: 02 Customer & Loyalty
+		lineageTag: 1a2b3c4d-8010-4a00-9000-000000000001
+
+	/// How many times more a cross-shopper spends (avg lifetime) vs a single-segment member.
+	measure 'Cross-Shop Spend Multiple' =
+			DIVIDE (
+			    CALCULATE ( AVERAGE ( 'dim_customer'[lifetime_spend_cad] ), 'dim_customer'[is_cross_category] = 1 ),
+			    CALCULATE ( AVERAGE ( 'dim_customer'[lifetime_spend_cad] ), 'dim_customer'[is_cross_category] = 0 )
+			)
+		formatString: 0.0"x"
+		displayFolder: 02 Customer & Loyalty
+		lineageTag: 1a2b3c4d-8011-4a00-9000-000000000001
+
+	/// Net Sales share of the all-stores total (for province / region share visuals).
+	measure 'Net Sales % of Total' = DIVIDE ( [Net Sales], CALCULATE ( [Net Sales], REMOVEFILTERS ( 'dim_store' ) ) )
+		formatString: 0.0%
+		displayFolder: 01 Sales
+		lineageTag: 1a2b3c4d-8012-4a00-9000-000000000001
+
+	measure 'Banner Segment Color' = IF ( SELECTEDVALUE ( 'dim_banner'[banner_category] ) = "Liquor", "#B5791F", "#157A52" )
+		displayFolder: CF Colors
+		lineageTag: 1a2b3c4d-9007-4a00-9000-000000000001
+
+	measure 'Category Segment Color' = VAR _c = SELECTEDVALUE ( 'dim_product'[category_name] ) RETURN IF ( _c IN { "Spirits", "Beer", "Wine", "Coolers & RTD", "Non-Alcoholic" }, "#B5791F", "#157A52" )
+		displayFolder: CF Colors
+		lineageTag: 1a2b3c4d-9008-4a00-9000-000000000001
+
+	/// Share of the enrollment cohort transacting in the period in context. Matrix: rows = enrollment_month, columns = dim_date month. LOCAL TWIN ONLY until enrollment_month exists in Gold.
+	measure 'Cohort Retention %' = DIVIDE([Active Customers], [Cohort Size])
+		formatString: 0.0%
+		displayFolder: 07 Advanced
+		lineageTag: 1a2b3c4d-7007-4a00-9000-000000000001
+
+	/// Customers in the enrollment-month cohort (denominator), ignoring all dim_customer filters except the cohort. LOCAL TWIN ONLY until enrollment_month exists in Gold.
+	measure 'Cohort Size' =
+			CALCULATE(
+			    DISTINCTCOUNT('dim_customer'[customer_business_key]),
+			    ALLEXCEPT('dim_customer', 'dim_customer'[enrollment_month])
+			)
+		formatString: #,0
+		displayFolder: 07 Advanced
+		lineageTag: 1a2b3c4d-7006-4a00-9000-000000000001
+
+	measure 'KPI Card ATV' = VAR _v = [Avg Transaction Value] VAR _num = FORMAT ( _v, "$#,0.00" ) VAR _yoy = [Avg Transaction Value YoY %] VAR _yoyBlank = ISBLANK ( _yoy ) VAR _up = _yoy >= 0 VAR _chip = IF ( _yoyBlank, "no PY data", FORMAT ( _yoy, "+0.0%;-0.0%" ) & " vs PY" ) VAR _col = IF ( _yoyBlank, "#5B6573", IF ( _up, "#1E8E5A", "#C4413B" ) ) VAR _bg = IF ( _yoyBlank, "#EEF1F4", IF ( _up, "#E7F2EC", "#FBEAE7" ) ) VAR _arrow = IF ( _yoyBlank, "", IF ( _up, "<path d='M9,5 L14,11 L4,11 Z' fill='" & _col & "'/>", "<path d='M4,5 L14,5 L9,11 Z' fill='" & _col & "'/>" ) ) VAR _chipw = 30 + LEN ( _chip ) * 7 VAR _months = CALCULATETABLE ( SUMMARIZE ( 'dim_date', 'dim_date'[calendar_year], 'dim_date'[month_of_year] ), ALLSELECTED ( 'dim_date' ) ) VAR _t = ADDCOLUMNS ( _months, "@idx", ( 'dim_date'[calendar_year] - 2024 ) * 12 + 'dim_date'[month_of_year], "@v", CALCULATE ( [Avg Transaction Value] ) ) VAR _nb = FILTER ( _t, NOT ISBLANK ( [@v] ) ) VAR _minI = MINX ( _nb, [@idx] ) VAR _maxI = MAXX ( _nb, [@idx] ) VAR _spanI = _maxI - _minI VAR _maxV = MAXX ( _nb, [@v] ) VAR _minV = MINX ( _nb, [@v] ) VAR _rangeV = _maxV - _minV VAR _pts = CONCATENATEX ( _nb, FORMAT ( 188 + IF ( _spanI = 0, 48, DIVIDE ( [@idx] - _minI, _spanI ) * 96 ), "0.0" ) & "," & FORMAT ( 84 - IF ( _rangeV = 0, 0.5, DIVIDE ( [@v] - _minV, _rangeV ) ) * 50, "0.0" ), " ", [@idx], ASC ) VAR _lastV = MAXX ( FILTER ( _nb, [@idx] = _maxI ), [@v] ) VAR _lastY = 84 - IF ( _rangeV = 0, 0.5, DIVIDE ( _lastV - _minV, _rangeV ) ) * 50 VAR _spark = IF ( COUNTROWS ( _nb ) >= 2, "<polygon points='188,84 " & _pts & " 284,84' fill='#157A52' opacity='0.12'/><polyline points='" & _pts & "' fill='none' stroke='#157A52' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'/><circle cx='284' cy='" & FORMAT ( _lastY, "0.0" ) & "' r='3.2' fill='#157A52'/>", "" ) VAR _svg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 176'><text x='20' y='34' font-family='Segoe UI, sans-serif' font-size='15' font-weight='600' fill='#5B6573'>AVG BASKET</text>" & _spark & "<text x='20' y='92' font-family='Segoe UI Semibold, Segoe UI, sans-serif' font-size='46' font-weight='700' fill='#10151C'>" & _num & "</text><g transform='translate(20,112)'><rect x='0' y='0' width='" & FORMAT ( _chipw, "0" ) & "' height='30' rx='15' fill='" & _bg & "'/><g transform='translate(10,6)'>" & _arrow & "</g><text x='26' y='20' font-family='Segoe UI, sans-serif' font-size='14.5' font-weight='600' fill='" & _col & "'>" & _chip & "</text></g></svg>" RETURN _svg
+		displayFolder: SVG KPI Cards
+		lineageTag: 1a2b3c4d-9203-4b00-9000-000000000001
+		dataCategory: ImageUrl
+
+	measure 'KPI Card Gross Margin' = VAR _v = [Gross Margin %] VAR _num = FORMAT ( _v, "0.0%" ) VAR _yoy = [Gross Margin % Δ vs PY] VAR _yoyBlank = ISBLANK ( _yoy ) VAR _up = _yoy >= 0 VAR _chip = IF ( _yoyBlank, "no PY data", FORMAT ( _yoy, "+0.0;-0.0" ) & " pts vs PY" ) VAR _col = IF ( _yoyBlank, "#5B6573", IF ( _up, "#1E8E5A", "#C4413B" ) ) VAR _bg = IF ( _yoyBlank, "#EEF1F4", IF ( _up, "#E7F2EC", "#FBEAE7" ) ) VAR _arrow = IF ( _yoyBlank, "", IF ( _up, "<path d='M9,5 L14,11 L4,11 Z' fill='" & _col & "'/>", "<path d='M4,5 L14,5 L9,11 Z' fill='" & _col & "'/>" ) ) VAR _chipw = 30 + LEN ( _chip ) * 7 VAR _months = CALCULATETABLE ( SUMMARIZE ( 'dim_date', 'dim_date'[calendar_year], 'dim_date'[month_of_year] ), ALLSELECTED ( 'dim_date' ) ) VAR _t = ADDCOLUMNS ( _months, "@idx", ( 'dim_date'[calendar_year] - 2024 ) * 12 + 'dim_date'[month_of_year], "@v", CALCULATE ( [Gross Margin %] ) ) VAR _nb = FILTER ( _t, NOT ISBLANK ( [@v] ) ) VAR _minI = MINX ( _nb, [@idx] ) VAR _maxI = MAXX ( _nb, [@idx] ) VAR _spanI = _maxI - _minI VAR _maxV = MAXX ( _nb, [@v] ) VAR _minV = MINX ( _nb, [@v] ) VAR _rangeV = _maxV - _minV VAR _pts = CONCATENATEX ( _nb, FORMAT ( 188 + IF ( _spanI = 0, 48, DIVIDE ( [@idx] - _minI, _spanI ) * 96 ), "0.0" ) & "," & FORMAT ( 84 - IF ( _rangeV = 0, 0.5, DIVIDE ( [@v] - _minV, _rangeV ) ) * 50, "0.0" ), " ", [@idx], ASC ) VAR _lastV = MAXX ( FILTER ( _nb, [@idx] = _maxI ), [@v] ) VAR _lastY = 84 - IF ( _rangeV = 0, 0.5, DIVIDE ( _lastV - _minV, _rangeV ) ) * 50 VAR _spark = IF ( COUNTROWS ( _nb ) >= 2, "<polygon points='188,84 " & _pts & " 284,84' fill='#157A52' opacity='0.12'/><polyline points='" & _pts & "' fill='none' stroke='#157A52' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'/><circle cx='284' cy='" & FORMAT ( _lastY, "0.0" ) & "' r='3.2' fill='#157A52'/>", "" ) VAR _svg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 176'><text x='20' y='34' font-family='Segoe UI, sans-serif' font-size='15' font-weight='600' fill='#5B6573'>GROSS MARGIN %</text>" & _spark & "<text x='20' y='92' font-family='Segoe UI Semibold, Segoe UI, sans-serif' font-size='46' font-weight='700' fill='#10151C'>" & _num & "</text><g transform='translate(20,112)'><rect x='0' y='0' width='" & FORMAT ( _chipw, "0" ) & "' height='30' rx='15' fill='" & _bg & "'/><g transform='translate(10,6)'>" & _arrow & "</g><text x='26' y='20' font-family='Segoe UI, sans-serif' font-size='14.5' font-weight='600' fill='" & _col & "'>" & _chip & "</text></g></svg>" RETURN _svg
+		displayFolder: SVG KPI Cards
+		lineageTag: 1a2b3c4d-9201-4b00-9000-000000000001
+		dataCategory: ImageUrl
+
+	measure 'KPI Card Loyalty' = VAR _v = [Loyalty Transaction %] VAR _num = FORMAT ( _v, "0.0%" ) VAR _yoy = [Loyalty Penetration Δ vs PY] VAR _yoyBlank = ISBLANK ( _yoy ) VAR _up = _yoy >= 0 VAR _chip = IF ( _yoyBlank, "no PY data", FORMAT ( _yoy, "+0.0;-0.0" ) & " pts vs PY" ) VAR _col = IF ( _yoyBlank, "#5B6573", IF ( _up, "#1E8E5A", "#C4413B" ) ) VAR _bg = IF ( _yoyBlank, "#EEF1F4", IF ( _up, "#E7F2EC", "#FBEAE7" ) ) VAR _arrow = IF ( _yoyBlank, "", IF ( _up, "<path d='M9,5 L14,11 L4,11 Z' fill='" & _col & "'/>", "<path d='M4,5 L14,5 L9,11 Z' fill='" & _col & "'/>" ) ) VAR _chipw = 30 + LEN ( _chip ) * 7 VAR _months = CALCULATETABLE ( SUMMARIZE ( 'dim_date', 'dim_date'[calendar_year], 'dim_date'[month_of_year] ), ALLSELECTED ( 'dim_date' ) ) VAR _t = ADDCOLUMNS ( _months, "@idx", ( 'dim_date'[calendar_year] - 2024 ) * 12 + 'dim_date'[month_of_year], "@v", CALCULATE ( [Loyalty Transaction %] ) ) VAR _nb = FILTER ( _t, NOT ISBLANK ( [@v] ) ) VAR _minI = MINX ( _nb, [@idx] ) VAR _maxI = MAXX ( _nb, [@idx] ) VAR _spanI = _maxI - _minI VAR _maxV = MAXX ( _nb, [@v] ) VAR _minV = MINX ( _nb, [@v] ) VAR _rangeV = _maxV - _minV VAR _pts = CONCATENATEX ( _nb, FORMAT ( 188 + IF ( _spanI = 0, 48, DIVIDE ( [@idx] - _minI, _spanI ) * 96 ), "0.0" ) & "," & FORMAT ( 84 - IF ( _rangeV = 0, 0.5, DIVIDE ( [@v] - _minV, _rangeV ) ) * 50, "0.0" ), " ", [@idx], ASC ) VAR _lastV = MAXX ( FILTER ( _nb, [@idx] = _maxI ), [@v] ) VAR _lastY = 84 - IF ( _rangeV = 0, 0.5, DIVIDE ( _lastV - _minV, _rangeV ) ) * 50 VAR _spark = IF ( COUNTROWS ( _nb ) >= 2, "<polygon points='188,84 " & _pts & " 284,84' fill='#157A52' opacity='0.12'/><polyline points='" & _pts & "' fill='none' stroke='#157A52' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'/><circle cx='284' cy='" & FORMAT ( _lastY, "0.0" ) & "' r='3.2' fill='#157A52'/>", "" ) VAR _svg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 176'><text x='20' y='34' font-family='Segoe UI, sans-serif' font-size='15' font-weight='600' fill='#5B6573'>LOYALTY PENETRATION</text>" & _spark & "<text x='20' y='92' font-family='Segoe UI Semibold, Segoe UI, sans-serif' font-size='46' font-weight='700' fill='#10151C'>" & _num & "</text><g transform='translate(20,112)'><rect x='0' y='0' width='" & FORMAT ( _chipw, "0" ) & "' height='30' rx='15' fill='" & _bg & "'/><g transform='translate(10,6)'>" & _arrow & "</g><text x='26' y='20' font-family='Segoe UI, sans-serif' font-size='14.5' font-weight='600' fill='" & _col & "'>" & _chip & "</text></g></svg>" RETURN _svg
+		displayFolder: SVG KPI Cards
+		lineageTag: 1a2b3c4d-9204-4b00-9000-000000000001
+		dataCategory: ImageUrl
+
+	measure 'KPI Card Net Sales' = VAR _v = [Net Sales] VAR _num = "$" & SWITCH ( TRUE (), ABS ( _v ) >= 1000000000, FORMAT ( _v / 1000000000, "0.0" ) & "B", ABS ( _v ) >= 1000000, FORMAT ( _v / 1000000, "0.0" ) & "M", ABS ( _v ) >= 1000, FORMAT ( _v / 1000, "0.0" ) & "K", FORMAT ( _v, "0" ) ) VAR _yoy = [Net Sales YoY %] VAR _yoyBlank = ISBLANK ( _yoy ) VAR _up = _yoy >= 0 VAR _chip = IF ( _yoyBlank, "no PY data", FORMAT ( _yoy, "+0.0%;-0.0%" ) & " vs PY" ) VAR _col = IF ( _yoyBlank, "#5B6573", IF ( _up, "#1E8E5A", "#C4413B" ) ) VAR _bg = IF ( _yoyBlank, "#EEF1F4", IF ( _up, "#E7F2EC", "#FBEAE7" ) ) VAR _arrow = IF ( _yoyBlank, "", IF ( _up, "<path d='M9,5 L14,11 L4,11 Z' fill='" & _col & "'/>", "<path d='M4,5 L14,5 L9,11 Z' fill='" & _col & "'/>" ) ) VAR _chipw = 30 + LEN ( _chip ) * 7 VAR _months = CALCULATETABLE ( SUMMARIZE ( 'dim_date', 'dim_date'[calendar_year], 'dim_date'[month_of_year] ), ALLSELECTED ( 'dim_date' ) ) VAR _t = ADDCOLUMNS ( _months, "@idx", ( 'dim_date'[calendar_year] - 2024 ) * 12 + 'dim_date'[month_of_year], "@v", CALCULATE ( [Net Sales] ) ) VAR _nb = FILTER ( _t, NOT ISBLANK ( [@v] ) ) VAR _minI = MINX ( _nb, [@idx] ) VAR _maxI = MAXX ( _nb, [@idx] ) VAR _spanI = _maxI - _minI VAR _maxV = MAXX ( _nb, [@v] ) VAR _minV = MINX ( _nb, [@v] ) VAR _rangeV = _maxV - _minV VAR _pts = CONCATENATEX ( _nb, FORMAT ( 188 + IF ( _spanI = 0, 48, DIVIDE ( [@idx] - _minI, _spanI ) * 96 ), "0.0" ) & "," & FORMAT ( 84 - IF ( _rangeV = 0, 0.5, DIVIDE ( [@v] - _minV, _rangeV ) ) * 50, "0.0" ), " ", [@idx], ASC ) VAR _lastV = MAXX ( FILTER ( _nb, [@idx] = _maxI ), [@v] ) VAR _lastY = 84 - IF ( _rangeV = 0, 0.5, DIVIDE ( _lastV - _minV, _rangeV ) ) * 50 VAR _spark = IF ( COUNTROWS ( _nb ) >= 2, "<polygon points='188,84 " & _pts & " 284,84' fill='#157A52' opacity='0.12'/><polyline points='" & _pts & "' fill='none' stroke='#157A52' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'/><circle cx='284' cy='" & FORMAT ( _lastY, "0.0" ) & "' r='3.2' fill='#157A52'/>", "" ) VAR _svg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 176'><text x='20' y='34' font-family='Segoe UI, sans-serif' font-size='15' font-weight='600' fill='#5B6573'>NET SALES</text>" & _spark & "<text x='20' y='92' font-family='Segoe UI Semibold, Segoe UI, sans-serif' font-size='46' font-weight='700' fill='#10151C'>" & _num & "</text><g transform='translate(20,112)'><rect x='0' y='0' width='" & FORMAT ( _chipw, "0" ) & "' height='30' rx='15' fill='" & _bg & "'/><g transform='translate(10,6)'>" & _arrow & "</g><text x='26' y='20' font-family='Segoe UI, sans-serif' font-size='14.5' font-weight='600' fill='" & _col & "'>" & _chip & "</text></g></svg>" RETURN _svg
+		displayFolder: SVG KPI Cards
+		lineageTag: 1a2b3c4d-9200-4b00-9000-000000000001
+		dataCategory: ImageUrl
+
+	measure 'KPI Card Transactions' = VAR _v = [Total Transactions] VAR _num = SWITCH ( TRUE (), ABS ( _v ) >= 1000000000, FORMAT ( _v / 1000000000, "0.0" ) & "B", ABS ( _v ) >= 1000000, FORMAT ( _v / 1000000, "0.0" ) & "M", ABS ( _v ) >= 1000, FORMAT ( _v / 1000, "0.0" ) & "K", FORMAT ( _v, "0" ) ) VAR _yoy = [Transactions YoY %] VAR _yoyBlank = ISBLANK ( _yoy ) VAR _up = _yoy >= 0 VAR _chip = IF ( _yoyBlank, "no PY data", FORMAT ( _yoy, "+0.0%;-0.0%" ) & " vs PY" ) VAR _col = IF ( _yoyBlank, "#5B6573", IF ( _up, "#1E8E5A", "#C4413B" ) ) VAR _bg = IF ( _yoyBlank, "#EEF1F4", IF ( _up, "#E7F2EC", "#FBEAE7" ) ) VAR _arrow = IF ( _yoyBlank, "", IF ( _up, "<path d='M9,5 L14,11 L4,11 Z' fill='" & _col & "'/>", "<path d='M4,5 L14,5 L9,11 Z' fill='" & _col & "'/>" ) ) VAR _chipw = 30 + LEN ( _chip ) * 7 VAR _months = CALCULATETABLE ( SUMMARIZE ( 'dim_date', 'dim_date'[calendar_year], 'dim_date'[month_of_year] ), ALLSELECTED ( 'dim_date' ) ) VAR _t = ADDCOLUMNS ( _months, "@idx", ( 'dim_date'[calendar_year] - 2024 ) * 12 + 'dim_date'[month_of_year], "@v", CALCULATE ( [Total Transactions] ) ) VAR _nb = FILTER ( _t, NOT ISBLANK ( [@v] ) ) VAR _minI = MINX ( _nb, [@idx] ) VAR _maxI = MAXX ( _nb, [@idx] ) VAR _spanI = _maxI - _minI VAR _maxV = MAXX ( _nb, [@v] ) VAR _minV = MINX ( _nb, [@v] ) VAR _rangeV = _maxV - _minV VAR _pts = CONCATENATEX ( _nb, FORMAT ( 188 + IF ( _spanI = 0, 48, DIVIDE ( [@idx] - _minI, _spanI ) * 96 ), "0.0" ) & "," & FORMAT ( 84 - IF ( _rangeV = 0, 0.5, DIVIDE ( [@v] - _minV, _rangeV ) ) * 50, "0.0" ), " ", [@idx], ASC ) VAR _lastV = MAXX ( FILTER ( _nb, [@idx] = _maxI ), [@v] ) VAR _lastY = 84 - IF ( _rangeV = 0, 0.5, DIVIDE ( _lastV - _minV, _rangeV ) ) * 50 VAR _spark = IF ( COUNTROWS ( _nb ) >= 2, "<polygon points='188,84 " & _pts & " 284,84' fill='#157A52' opacity='0.12'/><polyline points='" & _pts & "' fill='none' stroke='#157A52' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'/><circle cx='284' cy='" & FORMAT ( _lastY, "0.0" ) & "' r='3.2' fill='#157A52'/>", "" ) VAR _svg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 176'><text x='20' y='34' font-family='Segoe UI, sans-serif' font-size='15' font-weight='600' fill='#5B6573'>TRANSACTIONS</text>" & _spark & "<text x='20' y='92' font-family='Segoe UI Semibold, Segoe UI, sans-serif' font-size='46' font-weight='700' fill='#10151C'>" & _num & "</text><g transform='translate(20,112)'><rect x='0' y='0' width='" & FORMAT ( _chipw, "0" ) & "' height='30' rx='15' fill='" & _bg & "'/><g transform='translate(10,6)'>" & _arrow & "</g><text x='26' y='20' font-family='Segoe UI, sans-serif' font-size='14.5' font-weight='600' fill='" & _col & "'>" & _chip & "</text></g></svg>" RETURN _svg
+		displayFolder: SVG KPI Cards
+		lineageTag: 1a2b3c4d-9202-4b00-9000-000000000001
+		dataCategory: ImageUrl
+
+	measure 'KPI Card UPT' = VAR _v = [Units per Transaction] VAR _num = FORMAT ( _v, "0.00" ) VAR _yoy = [Units per Transaction YoY %] VAR _yoyBlank = ISBLANK ( _yoy ) VAR _up = _yoy >= 0 VAR _chip = IF ( _yoyBlank, "no PY data", FORMAT ( _yoy, "+0.0%;-0.0%" ) & " vs PY" ) VAR _col = IF ( _yoyBlank, "#5B6573", IF ( _up, "#1E8E5A", "#C4413B" ) ) VAR _bg = IF ( _yoyBlank, "#EEF1F4", IF ( _up, "#E7F2EC", "#FBEAE7" ) ) VAR _arrow = IF ( _yoyBlank, "", IF ( _up, "<path d='M9,5 L14,11 L4,11 Z' fill='" & _col & "'/>", "<path d='M4,5 L14,5 L9,11 Z' fill='" & _col & "'/>" ) ) VAR _chipw = 30 + LEN ( _chip ) * 7 VAR _months = CALCULATETABLE ( SUMMARIZE ( 'dim_date', 'dim_date'[calendar_year], 'dim_date'[month_of_year] ), ALLSELECTED ( 'dim_date' ) ) VAR _t = ADDCOLUMNS ( _months, "@idx", ( 'dim_date'[calendar_year] - 2024 ) * 12 + 'dim_date'[month_of_year], "@v", CALCULATE ( [Units per Transaction] ) ) VAR _nb = FILTER ( _t, NOT ISBLANK ( [@v] ) ) VAR _minI = MINX ( _nb, [@idx] ) VAR _maxI = MAXX ( _nb, [@idx] ) VAR _spanI = _maxI - _minI VAR _maxV = MAXX ( _nb, [@v] ) VAR _minV = MINX ( _nb, [@v] ) VAR _rangeV = _maxV - _minV VAR _pts = CONCATENATEX ( _nb, FORMAT ( 188 + IF ( _spanI = 0, 48, DIVIDE ( [@idx] - _minI, _spanI ) * 96 ), "0.0" ) & "," & FORMAT ( 84 - IF ( _rangeV = 0, 0.5, DIVIDE ( [@v] - _minV, _rangeV ) ) * 50, "0.0" ), " ", [@idx], ASC ) VAR _lastV = MAXX ( FILTER ( _nb, [@idx] = _maxI ), [@v] ) VAR _lastY = 84 - IF ( _rangeV = 0, 0.5, DIVIDE ( _lastV - _minV, _rangeV ) ) * 50 VAR _spark = IF ( COUNTROWS ( _nb ) >= 2, "<polygon points='188,84 " & _pts & " 284,84' fill='#157A52' opacity='0.12'/><polyline points='" & _pts & "' fill='none' stroke='#157A52' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'/><circle cx='284' cy='" & FORMAT ( _lastY, "0.0" ) & "' r='3.2' fill='#157A52'/>", "" ) VAR _svg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 176'><text x='20' y='34' font-family='Segoe UI, sans-serif' font-size='15' font-weight='600' fill='#5B6573'>UNITS / TRANSACTION</text>" & _spark & "<text x='20' y='92' font-family='Segoe UI Semibold, Segoe UI, sans-serif' font-size='46' font-weight='700' fill='#10151C'>" & _num & "</text><g transform='translate(20,112)'><rect x='0' y='0' width='" & FORMAT ( _chipw, "0" ) & "' height='30' rx='15' fill='" & _bg & "'/><g transform='translate(10,6)'>" & _arrow & "</g><text x='26' y='20' font-family='Segoe UI, sans-serif' font-size='14.5' font-weight='600' fill='" & _col & "'>" & _chip & "</text></g></svg>" RETURN _svg
+		displayFolder: SVG KPI Cards
+		lineageTag: 1a2b3c4d-9205-4b00-9000-000000000001
+		dataCategory: ImageUrl
+
+	measure 'KPI Spark ATV' = VAR _months = CALCULATETABLE ( SUMMARIZE ( 'dim_date', 'dim_date'[calendar_year], 'dim_date'[month_of_year] ), ALLSELECTED ( 'dim_date' ) ) VAR _t = ADDCOLUMNS ( _months, "@idx", ( 'dim_date'[calendar_year] - 2024 ) * 12 + 'dim_date'[month_of_year], "@v", CALCULATE ( [Avg Transaction Value] ) ) VAR _nb = FILTER ( _t, NOT ISBLANK ( [@v] ) ) VAR _minI = MINX ( _t, [@idx] ) VAR _maxI = MAXX ( _t, [@idx] ) VAR _spanI = _maxI - _minI VAR _maxV = MAXX ( _t, [@v] ) VAR _pts = CONCATENATEX ( _nb, ROUND ( IF ( _spanI = 0, 50, DIVIDE ( [@idx] - _minI, _spanI ) * 100 ), 1 ) & "," & ROUND ( 28 - DIVIDE ( [@v], _maxV ) * 26, 1 ), " ", [@idx], ASC ) VAR _svg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 30'><polyline points='" & _pts & "' fill='none' stroke='#157A52' stroke-width='2.5'/></svg>" RETURN IF ( ISBLANK ( _pts ) || _maxV = 0 || COUNTROWS ( _nb ) < 2, BLANK (), _svg )
+		displayFolder: SVG KPI
+		lineageTag: 1a2b3c4d-9004-4a00-9000-000000000001
+		dataCategory: ImageUrl
+
+	measure 'KPI Spark Gross Margin' = VAR _months = CALCULATETABLE ( SUMMARIZE ( 'dim_date', 'dim_date'[calendar_year], 'dim_date'[month_of_year] ), ALLSELECTED ( 'dim_date' ) ) VAR _t = ADDCOLUMNS ( _months, "@idx", ( 'dim_date'[calendar_year] - 2024 ) * 12 + 'dim_date'[month_of_year], "@v", CALCULATE ( [Gross Margin %] ) ) VAR _nb = FILTER ( _t, NOT ISBLANK ( [@v] ) ) VAR _minI = MINX ( _t, [@idx] ) VAR _maxI = MAXX ( _t, [@idx] ) VAR _spanI = _maxI - _minI VAR _maxV = MAXX ( _t, [@v] ) VAR _pts = CONCATENATEX ( _nb, ROUND ( IF ( _spanI = 0, 50, DIVIDE ( [@idx] - _minI, _spanI ) * 100 ), 1 ) & "," & ROUND ( 28 - DIVIDE ( [@v], _maxV ) * 26, 1 ), " ", [@idx], ASC ) VAR _svg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 30'><polyline points='" & _pts & "' fill='none' stroke='#157A52' stroke-width='2.5'/></svg>" RETURN IF ( ISBLANK ( _pts ) || _maxV = 0 || COUNTROWS ( _nb ) < 2, BLANK (), _svg )
+		displayFolder: SVG KPI
+		lineageTag: 1a2b3c4d-9002-4a00-9000-000000000001
+		dataCategory: ImageUrl
+
+	measure 'KPI Spark Loyalty' = VAR _months = CALCULATETABLE ( SUMMARIZE ( 'dim_date', 'dim_date'[calendar_year], 'dim_date'[month_of_year] ), ALLSELECTED ( 'dim_date' ) ) VAR _t = ADDCOLUMNS ( _months, "@idx", ( 'dim_date'[calendar_year] - 2024 ) * 12 + 'dim_date'[month_of_year], "@v", CALCULATE ( [Loyalty Transaction %] ) ) VAR _nb = FILTER ( _t, NOT ISBLANK ( [@v] ) ) VAR _minI = MINX ( _t, [@idx] ) VAR _maxI = MAXX ( _t, [@idx] ) VAR _spanI = _maxI - _minI VAR _maxV = MAXX ( _t, [@v] ) VAR _pts = CONCATENATEX ( _nb, ROUND ( IF ( _spanI = 0, 50, DIVIDE ( [@idx] - _minI, _spanI ) * 100 ), 1 ) & "," & ROUND ( 28 - DIVIDE ( [@v], _maxV ) * 26, 1 ), " ", [@idx], ASC ) VAR _svg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 30'><polyline points='" & _pts & "' fill='none' stroke='#157A52' stroke-width='2.5'/></svg>" RETURN IF ( ISBLANK ( _pts ) || _maxV = 0 || COUNTROWS ( _nb ) < 2, BLANK (), _svg )
+		displayFolder: SVG KPI
+		lineageTag: 1a2b3c4d-9005-4a00-9000-000000000001
+		dataCategory: ImageUrl
+
+	measure 'KPI Spark Net Sales' = VAR _months = CALCULATETABLE ( SUMMARIZE ( 'dim_date', 'dim_date'[calendar_year], 'dim_date'[month_of_year] ), ALLSELECTED ( 'dim_date' ) ) VAR _t = ADDCOLUMNS ( _months, "@idx", ( 'dim_date'[calendar_year] - 2024 ) * 12 + 'dim_date'[month_of_year], "@v", CALCULATE ( [Net Sales] ) ) VAR _nb = FILTER ( _t, NOT ISBLANK ( [@v] ) ) VAR _minI = MINX ( _t, [@idx] ) VAR _maxI = MAXX ( _t, [@idx] ) VAR _spanI = _maxI - _minI VAR _maxV = MAXX ( _t, [@v] ) VAR _pts = CONCATENATEX ( _nb, ROUND ( IF ( _spanI = 0, 50, DIVIDE ( [@idx] - _minI, _spanI ) * 100 ), 1 ) & "," & ROUND ( 28 - DIVIDE ( [@v], _maxV ) * 26, 1 ), " ", [@idx], ASC ) VAR _svg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 30'><polyline points='" & _pts & "' fill='none' stroke='#157A52' stroke-width='2.5'/></svg>" RETURN IF ( ISBLANK ( _pts ) || _maxV = 0 || COUNTROWS ( _nb ) < 2, BLANK (), _svg )
+		displayFolder: SVG KPI
+		lineageTag: 1a2b3c4d-9001-4a00-9000-000000000001
+		dataCategory: ImageUrl
+
+	measure 'KPI Spark Transactions' = VAR _months = CALCULATETABLE ( SUMMARIZE ( 'dim_date', 'dim_date'[calendar_year], 'dim_date'[month_of_year] ), ALLSELECTED ( 'dim_date' ) ) VAR _t = ADDCOLUMNS ( _months, "@idx", ( 'dim_date'[calendar_year] - 2024 ) * 12 + 'dim_date'[month_of_year], "@v", CALCULATE ( [Total Transactions] ) ) VAR _nb = FILTER ( _t, NOT ISBLANK ( [@v] ) ) VAR _minI = MINX ( _t, [@idx] ) VAR _maxI = MAXX ( _t, [@idx] ) VAR _spanI = _maxI - _minI VAR _maxV = MAXX ( _t, [@v] ) VAR _pts = CONCATENATEX ( _nb, ROUND ( IF ( _spanI = 0, 50, DIVIDE ( [@idx] - _minI, _spanI ) * 100 ), 1 ) & "," & ROUND ( 28 - DIVIDE ( [@v], _maxV ) * 26, 1 ), " ", [@idx], ASC ) VAR _svg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 30'><polyline points='" & _pts & "' fill='none' stroke='#157A52' stroke-width='2.5'/></svg>" RETURN IF ( ISBLANK ( _pts ) || _maxV = 0 || COUNTROWS ( _nb ) < 2, BLANK (), _svg )
+		displayFolder: SVG KPI
+		lineageTag: 1a2b3c4d-9003-4a00-9000-000000000001
+		dataCategory: ImageUrl
+
+	measure 'KPI Spark UPT' = VAR _months = CALCULATETABLE ( SUMMARIZE ( 'dim_date', 'dim_date'[calendar_year], 'dim_date'[month_of_year] ), ALLSELECTED ( 'dim_date' ) ) VAR _t = ADDCOLUMNS ( _months, "@idx", ( 'dim_date'[calendar_year] - 2024 ) * 12 + 'dim_date'[month_of_year], "@v", CALCULATE ( [Units per Transaction] ) ) VAR _nb = FILTER ( _t, NOT ISBLANK ( [@v] ) ) VAR _minI = MINX ( _t, [@idx] ) VAR _maxI = MAXX ( _t, [@idx] ) VAR _spanI = _maxI - _minI VAR _maxV = MAXX ( _t, [@v] ) VAR _pts = CONCATENATEX ( _nb, ROUND ( IF ( _spanI = 0, 50, DIVIDE ( [@idx] - _minI, _spanI ) * 100 ), 1 ) & "," & ROUND ( 28 - DIVIDE ( [@v], _maxV ) * 26, 1 ), " ", [@idx], ASC ) VAR _svg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 30'><polyline points='" & _pts & "' fill='none' stroke='#157A52' stroke-width='2.5'/></svg>" RETURN IF ( ISBLANK ( _pts ) || _maxV = 0 || COUNTROWS ( _nb ) < 2, BLANK (), _svg )
+		displayFolder: SVG KPI
+		lineageTag: 1a2b3c4d-9006-4a00-9000-000000000001
+		dataCategory: ImageUrl
+
+	column Column1
+		dataType: int64
+		isHidden
+		lineageTag: 1a2b3c4d-0002-4a00-9000-000000000001
+		summarizeBy: none
+		sourceColumn: Column1
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows({{1}}, {"Column1"})
+				in
+				    Source
+

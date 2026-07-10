@@ -1,0 +1,19 @@
+/// Object-level security — an analyst role that cannot see customer PII columns.
+/// `none` hides the column entirely (not even the metadata is visible).
+role 'OLS Analyst No PII'
+	modelPermission: read
+
+	tablePermission dim_customer
+
+		columnPermission email_hash = none
+
+		columnPermission phone_hash = none
+
+		columnPermission first_name = none
+
+		columnPermission last_name = none
+
+		columnPermission birth_year = none
+
+		columnPermission home_postal_code = none
+

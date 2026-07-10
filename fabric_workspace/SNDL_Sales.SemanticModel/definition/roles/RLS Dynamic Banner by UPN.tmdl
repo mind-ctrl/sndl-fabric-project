@@ -1,0 +1,17 @@
+/// Dynamic row-level security — maps the signed-in user (USERPRINCIPALNAME) to the
+/// banners they're allowed to see via a security bridge table `dim_user_banner`
+/// (user_email, banner_id). Add that table in a later iteration; the pattern is the
+/// production-grade approach (one role, data-driven) vs a role per banner.
+role 'RLS Dynamic Banner by UPN'
+	modelPermission: read
+
+	tablePermission dim_store =
+			VAR _user = USERPRINCIPALNAME()
+			VAR _allowed =
+			    CALCULATETABLE(
+			        VALUES(dim_user_banner[banner_id]),
+			        dim_user_banner[user_email] = _user
+			    )
+			RETURN
+			    dim_store[banner_id] IN _allowed
+

@@ -1,0 +1,183 @@
+table dim_product
+	lineageTag: 9f2a7620-bbff-433e-be79-a28e53f7d671
+
+	column product_id
+		dataType: int64
+		lineageTag: 26c4279d-f85e-4d8d-ab92-5417593a89ce
+		summarizeBy: none
+		sourceColumn: product_id
+
+	column sku
+		dataType: string
+		lineageTag: 7d5053c2-4e7d-464f-9677-567a2174e28a
+		summarizeBy: none
+		sourceColumn: sku
+
+	column product_name
+		dataType: string
+		lineageTag: c1d8fa17-83db-4b07-9c97-a2e8e440f197
+		summarizeBy: none
+		sourceColumn: product_name
+
+	column category_id
+		dataType: int64
+		lineageTag: 89181074-12f1-4467-91ee-55e19de833d4
+		summarizeBy: none
+		sourceColumn: category_id
+
+	column category_name
+		dataType: string
+		lineageTag: 65f11338-a6f1-4c41-9706-ac8fc956fbc0
+		summarizeBy: none
+		sourceColumn: category_name
+
+	column subcategory_name
+		dataType: string
+		lineageTag: 03c588d5-5729-4591-87c7-855abe01268b
+		summarizeBy: none
+		sourceColumn: subcategory_name
+
+	column brand
+		dataType: string
+		lineageTag: 293cd678-a296-4aab-9bc6-25b61a9fa21d
+		summarizeBy: none
+		sourceColumn: brand
+
+	column manufacturer
+		dataType: string
+		lineageTag: 2179c537-3fe2-4605-ba68-c971a74f203e
+		summarizeBy: none
+		sourceColumn: manufacturer
+
+	column is_sndl_own_brand
+		dataType: int64
+		lineageTag: b414bc59-2ed0-4529-81fd-847052eed11c
+		summarizeBy: none
+		sourceColumn: is_sndl_own_brand
+
+	column format_size
+		dataType: double
+		lineageTag: 4f241250-822f-4e08-990f-6cb0cba95915
+		summarizeBy: none
+		sourceColumn: format_size
+
+	column format_unit
+		dataType: string
+		lineageTag: 87b8550f-45a5-462c-b9c7-132e4f3822b3
+		summarizeBy: none
+		sourceColumn: format_unit
+
+	column pack_size
+		dataType: int64
+		lineageTag: 47f8d354-10bb-4e22-9c39-de9d5fe5e1eb
+		summarizeBy: none
+		sourceColumn: pack_size
+
+	column abv_or_thc_pct
+		dataType: double
+		lineageTag: 0c1fed2b-3cfd-42e5-b0c4-eca420803f43
+		summarizeBy: none
+		sourceColumn: abv_or_thc_pct
+
+	column cbd_pct
+		dataType: double
+		lineageTag: c5ee2d6c-500b-4a97-bd63-7db182a81a2b
+		summarizeBy: none
+		sourceColumn: cbd_pct
+
+	column cannabis_strain_type
+		dataType: double
+		lineageTag: 5f8727c4-07ef-4be4-a9cb-270e3362451e
+		summarizeBy: none
+		sourceColumn: cannabis_strain_type
+
+	column country_of_origin
+		dataType: string
+		lineageTag: f8567ffc-14eb-4a8c-bd33-5d3b58108ee0
+		summarizeBy: none
+		sourceColumn: country_of_origin
+
+	column cost_price_cad
+		dataType: double
+		lineageTag: 7766ea99-3f85-41df-baaa-48a77d889393
+		summarizeBy: none
+		sourceColumn: cost_price_cad
+
+	column list_price_cad
+		dataType: double
+		lineageTag: e34eebbb-1830-4a18-947f-25aa4a476d2f
+		summarizeBy: none
+		sourceColumn: list_price_cad
+
+	column price_tier
+		dataType: string
+		lineageTag: 81786a1c-fc04-4c26-a9c4-a817086b971b
+		summarizeBy: none
+		sourceColumn: price_tier
+
+	column applicable_banner_ids
+		dataType: string
+		lineageTag: 70615113-8888-443d-b1eb-ac9535e2b8c7
+		summarizeBy: none
+		sourceColumn: applicable_banner_ids
+
+	column launch_date
+		dataType: dateTime
+		lineageTag: 6e94d8f2-154c-4c3b-bfef-b0d3c9070a05
+		summarizeBy: none
+		sourceColumn: launch_date
+
+	column discontinue_date
+		dataType: dateTime
+		lineageTag: 844b8a90-9dbb-43a6-a824-098782fbd2a0
+		summarizeBy: none
+		sourceColumn: discontinue_date
+
+	column is_seasonal
+		dataType: int64
+		lineageTag: a4874fb0-fae2-4437-9e8c-62b282e54b76
+		summarizeBy: none
+		sourceColumn: is_seasonal
+
+	column product_sk
+		dataType: int64
+		isHidden
+		lineageTag: 02afdc23-d511-4e06-b423-d80811a069ea
+		summarizeBy: none
+		sourceColumn: product_sk
+
+	column scd_hash
+		dataType: string
+		isHidden
+		lineageTag: 61a1378f-1ed8-4a22-8927-3a9a17ba0831
+		summarizeBy: none
+		sourceColumn: scd_hash
+
+	column effective_from
+		dataType: dateTime
+		isHidden
+		lineageTag: 0c1ae073-71ef-44c6-a49b-4ffeaf09a19a
+		summarizeBy: none
+		sourceColumn: effective_from
+
+	column effective_to
+		dataType: dateTime
+		isHidden
+		lineageTag: 239594d2-394d-4e3f-b60b-f434d50af14e
+		summarizeBy: none
+		sourceColumn: effective_to
+
+	column is_current
+		dataType: int64
+		isHidden
+		lineageTag: edcf4103-55ac-486e-9d77-d374da0d59e1
+		summarizeBy: none
+		sourceColumn: is_current
+
+	partition dim_product = entity
+		mode: directLake
+		source
+			entityName: dim_product
+			schemaName: gold
+			expressionSource: DatabaseQuery
+

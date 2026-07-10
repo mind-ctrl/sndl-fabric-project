@@ -1,0 +1,94 @@
+table dim_promotion
+	lineageTag: bfc54830-ee60-4c22-b73e-70fcea4ac719
+
+	column promotion_id
+		dataType: int64
+		lineageTag: caea1f63-b125-43af-b9c7-1aa6acd894ba
+		summarizeBy: none
+		sourceColumn: promotion_id
+
+	column promotion_name
+		dataType: string
+		lineageTag: 5ab9070e-5067-4998-b21c-abef3bf3ac62
+		summarizeBy: none
+		sourceColumn: promotion_name
+
+	column promotion_type
+		dataType: string
+		lineageTag: 8827d68d-82b0-4757-b0d3-f11a4b707a71
+		summarizeBy: none
+		sourceColumn: promotion_type
+
+	column discount_pct
+		dataType: double
+		lineageTag: 0e803546-ee7f-49c6-a2ca-8eb740e03b49
+		summarizeBy: none
+		sourceColumn: discount_pct
+
+	column discount_amount_cad
+		dataType: double
+		lineageTag: 65569287-86d1-4a45-8e1c-549ce55280c2
+		summarizeBy: none
+		sourceColumn: discount_amount_cad
+
+	column start_date
+		dataType: dateTime
+		lineageTag: 5356e53e-c3ac-4e14-87ab-a83014f0e213
+		summarizeBy: none
+		sourceColumn: start_date
+
+	column end_date
+		dataType: dateTime
+		lineageTag: 7503bff9-0ef6-4a1a-a4bb-d3ea5cb17333
+		summarizeBy: none
+		sourceColumn: end_date
+
+	column target_banner_ids
+		dataType: string
+		lineageTag: 3e2f57e9-981c-4d78-b7ad-6afbc32707d6
+		summarizeBy: none
+		sourceColumn: target_banner_ids
+
+	column target_category_ids
+		dataType: string
+		lineageTag: 3d8c4ccd-7d6a-4ad7-af0e-6b22cffb7780
+		summarizeBy: none
+		sourceColumn: target_category_ids
+
+	column target_product_ids
+		dataType: double
+		lineageTag: 8729e4d9-648b-41be-8515-4659843cb8e6
+		summarizeBy: none
+		sourceColumn: target_product_ids
+
+	column target_loyalty_tiers
+		dataType: string
+		lineageTag: 8970bef0-771e-454b-b370-cc3c54b17cdb
+		summarizeBy: none
+		sourceColumn: target_loyalty_tiers
+
+	column expected_lift_pct
+		dataType: double
+		lineageTag: 4dbfa3ff-c1ea-43cf-a70a-2479a7a5e881
+		summarizeBy: none
+		sourceColumn: expected_lift_pct
+
+	column actual_lift_pct
+		dataType: double
+		lineageTag: 754a11ec-d86b-45d3-8ac6-ac80de9ad7e9
+		summarizeBy: none
+		sourceColumn: actual_lift_pct
+
+	column budget_cad
+		dataType: double
+		lineageTag: 5eff1f1b-f215-495c-8099-0788106c9da3
+		summarizeBy: none
+		sourceColumn: budget_cad
+
+	partition dim_promotion = entity
+		mode: directLake
+		source
+			entityName: dim_promotion
+			schemaName: gold
+			expressionSource: DatabaseQuery
+

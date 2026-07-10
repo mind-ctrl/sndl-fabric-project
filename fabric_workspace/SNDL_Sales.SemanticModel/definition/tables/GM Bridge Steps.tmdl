@@ -1,0 +1,22 @@
+/// Disconnected step axis for the gross-margin bridge waterfall.
+table 'GM Bridge Steps'
+	lineageTag: 1a2b3c4d-8100-4a00-9000-000000000001
+
+	column Step
+		dataType: string
+		lineageTag: 1a2b3c4d-8101-4a00-9000-000000000001
+		summarizeBy: none
+		sourceColumn: [Step]
+		sortByColumn: StepOrder
+
+	column StepOrder
+		dataType: int64
+		isHidden
+		lineageTag: 1a2b3c4d-8102-4a00-9000-000000000001
+		summarizeBy: none
+		sourceColumn: [StepOrder]
+
+	partition 'GM Bridge Steps' = calculated
+		mode: import
+		source = DATATABLE ( "Step", STRING, "StepOrder", INTEGER, { { "GM PY", 0 }, { "Volume", 1 }, { "Mix", 2 }, { "Price", 3 }, { "Markdown", 4 }, { "Cost", 5 } } )
+

@@ -1,0 +1,186 @@
+table dim_customer
+	lineageTag: 66223d39-0f44-4472-aab5-5c3cd3d2c310
+
+	column customer_id
+		dataType: int64
+		lineageTag: c769c1c5-cc93-49e6-b123-00d26c93799d
+		summarizeBy: none
+		sourceColumn: customer_id
+
+	column customer_business_key
+		dataType: string
+		lineageTag: bca86645-d798-4ec3-b5bb-c2ab2bdd7e9a
+		summarizeBy: none
+		sourceColumn: customer_business_key
+
+	column email_hash
+		dataType: string
+		lineageTag: 17634375-078a-4948-9f26-c368c9b94775
+		summarizeBy: none
+		sourceColumn: email_hash
+
+	column phone_hash
+		dataType: string
+		lineageTag: 2fec81db-bba8-49de-9518-f4e7335799d1
+		summarizeBy: none
+		sourceColumn: phone_hash
+
+	column first_name
+		dataType: string
+		lineageTag: 9222423a-77ef-4710-ab8b-c728dfc21f12
+		summarizeBy: none
+		sourceColumn: first_name
+
+	column last_name
+		dataType: string
+		lineageTag: 13be40db-ed6f-4d1b-bea3-62021f17af13
+		summarizeBy: none
+		sourceColumn: last_name
+
+	column birth_year
+		dataType: int64
+		lineageTag: d8788800-4da1-4750-9f43-70c2fbd47985
+		summarizeBy: none
+		sourceColumn: birth_year
+
+	column gender
+		dataType: string
+		lineageTag: 908b518e-3b78-457f-b987-9462deb44292
+		summarizeBy: none
+		sourceColumn: gender
+
+	column home_postal_code
+		dataType: string
+		lineageTag: f2457b8d-ef58-4bb0-a59b-daaf29f1d3e6
+		summarizeBy: none
+		sourceColumn: home_postal_code
+
+	column home_fsa
+		dataType: string
+		lineageTag: fd5119fd-a046-48dd-b26e-f3d151379482
+		summarizeBy: none
+		sourceColumn: home_fsa
+
+	column home_province_code
+		dataType: string
+		lineageTag: f2d82330-fd4e-4000-93ba-871b3188588d
+		summarizeBy: none
+		sourceColumn: home_province_code
+
+	column home_city
+		dataType: string
+		lineageTag: 5adbb467-c327-4883-8432-ab67e325bcf5
+		summarizeBy: none
+		sourceColumn: home_city
+
+	column enrollment_date
+		dataType: dateTime
+		lineageTag: 8267e31b-9e5b-43f8-a68c-f6b0f06eea5f
+		summarizeBy: none
+		sourceColumn: enrollment_date
+
+	/// Cohort axis: first day of the customer's enrollment month. Physical Gold column
+	/// (computed in 04_Silver_to_Gold) — NOT a calc column, so Direct Lake can host it.
+	column enrollment_month
+		dataType: dateTime
+		formatString: mmm yyyy
+		lineageTag: 1a2b3c4d-7102-4a00-9000-0000000000c1
+		summarizeBy: none
+		sourceColumn: enrollment_month
+
+	column enrollment_store_id
+		dataType: int64
+		lineageTag: 114744a1-ec88-40c3-ba79-7f4d23a26e95
+		summarizeBy: none
+		sourceColumn: enrollment_store_id
+
+	column loyalty_tier
+		dataType: string
+		lineageTag: 8718a954-06cc-4bc5-9f92-efab38bd0fe3
+		summarizeBy: none
+		sourceColumn: loyalty_tier
+
+	column loyalty_points_balance
+		dataType: int64
+		lineageTag: 6a722efa-7140-4d7d-8b85-f3ab51166ccb
+		summarizeBy: none
+		sourceColumn: loyalty_points_balance
+
+	column lifetime_spend_cad
+		dataType: double
+		lineageTag: 78cf3efd-1cc9-46d4-9849-cce5ae526c33
+		summarizeBy: none
+		sourceColumn: lifetime_spend_cad
+
+	column last_purchase_date
+		dataType: dateTime
+		lineageTag: 20df46f8-039b-4e42-831d-a1d77f9c9776
+		summarizeBy: none
+		sourceColumn: last_purchase_date
+
+	column preferred_banner_id
+		dataType: int64
+		lineageTag: cec5ebb7-851c-47dc-992c-020a01e36a25
+		summarizeBy: none
+		sourceColumn: preferred_banner_id
+
+	column is_cross_category
+		dataType: int64
+		lineageTag: 3cc4ce6c-ef41-4d18-94ad-3207e562d5ab
+		summarizeBy: none
+		sourceColumn: is_cross_category
+
+	column marketing_consent
+		dataType: int64
+		lineageTag: 1f255b78-4680-4fe9-a299-0de29e90f0b8
+		summarizeBy: none
+		sourceColumn: marketing_consent
+
+	column is_active
+		dataType: int64
+		lineageTag: 3268e9ca-f450-4c65-99cf-002c75b31f64
+		summarizeBy: none
+		sourceColumn: is_active
+
+	column customer_sk
+		dataType: int64
+		isHidden
+		lineageTag: 086bb5ec-2f3e-4805-a738-027a7eb2c8c4
+		summarizeBy: none
+		sourceColumn: customer_sk
+
+	column scd_hash
+		dataType: string
+		isHidden
+		lineageTag: 6ff40bcd-bae9-491e-909d-e6e65d6e156e
+		summarizeBy: none
+		sourceColumn: scd_hash
+
+	column effective_from
+		dataType: dateTime
+		isHidden
+		lineageTag: 21ad14c1-48b5-4e45-9a89-31110a5b2593
+		summarizeBy: none
+		sourceColumn: effective_from
+
+	column effective_to
+		dataType: dateTime
+		isHidden
+		lineageTag: 46755bf0-f6b5-4c1e-be74-9f727056474e
+		summarizeBy: none
+		sourceColumn: effective_to
+
+	column is_current
+		dataType: int64
+		isHidden
+		lineageTag: 0b809d9c-1416-4e31-833c-affaffc21234
+		summarizeBy: none
+		sourceColumn: is_current
+
+	partition dim_customer = entity
+		mode: directLake
+		source
+			entityName: dim_customer
+			schemaName: gold
+			expressionSource: DatabaseQuery
+

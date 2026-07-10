@@ -1,0 +1,69 @@
+table fact_loyalty_event
+	lineageTag: 3cc25396-0147-49e3-bbca-369fcece4226
+
+	column loyalty_event_id
+		dataType: int64
+		isHidden
+		lineageTag: 29ab44f5-54ed-4138-b5fc-df751f089d93
+		summarizeBy: none
+		sourceColumn: loyalty_event_id
+
+	column event_date_id
+		dataType: int64
+		isHidden
+		lineageTag: 13cbcf86-0882-4497-8e81-aa478ec6f97b
+		summarizeBy: none
+		sourceColumn: event_date_id
+
+	column customer_id
+		dataType: int64
+		isHidden
+		lineageTag: 2676ffcf-e028-43be-9f23-2b563afd0f77
+		summarizeBy: none
+		sourceColumn: customer_id
+
+	column event_type
+		dataType: string
+		lineageTag: 4681ef3c-af53-4d76-a6ad-656788f19a15
+		summarizeBy: none
+		sourceColumn: event_type
+
+	column transaction_id
+		dataType: int64
+		isHidden
+		lineageTag: 089044ce-de6d-41a8-95ad-e02702c9ee35
+		summarizeBy: none
+		sourceColumn: transaction_id
+
+	column points_delta
+		dataType: int64
+		lineageTag: 69e28016-93d4-4ef4-a8e0-4635dfd3f145
+		summarizeBy: none
+		sourceColumn: points_delta
+
+	column points_balance_after
+		dataType: int64
+		lineageTag: 5f58e8bf-8436-46f3-bb83-098d44e3cfac
+		summarizeBy: none
+		sourceColumn: points_balance_after
+
+	column notes
+		dataType: double
+		lineageTag: 8c6d6754-72b1-4cc8-a6dd-184f4092e5f8
+		summarizeBy: none
+		sourceColumn: notes
+
+	column customer_sk
+		dataType: int64
+		isHidden
+		lineageTag: 81fc31f0-08f1-46f1-8a8b-64ad6ee871e3
+		summarizeBy: none
+		sourceColumn: customer_sk
+
+	partition fact_loyalty_event = entity
+		mode: directLake
+		source
+			entityName: fact_loyalty_event
+			schemaName: gold
+			expressionSource: DatabaseQuery
+

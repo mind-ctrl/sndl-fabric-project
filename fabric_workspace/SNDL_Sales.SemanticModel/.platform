@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "SNDL_Sales"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "568982c3-42ae-abb8-4a61-5fc8d47f1a51"
+  }
+}

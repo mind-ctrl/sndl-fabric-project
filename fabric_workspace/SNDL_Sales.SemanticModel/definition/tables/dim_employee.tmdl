@@ -1,0 +1,70 @@
+table dim_employee
+	lineageTag: 017c07fd-fda3-41b7-abd9-24dc0d6b318a
+
+	column employee_id
+		dataType: int64
+		lineageTag: 5af7e66b-b7b8-4041-a2cb-1ce76cfd1d04
+		summarizeBy: none
+		sourceColumn: employee_id
+
+	column employee_business_key
+		dataType: string
+		lineageTag: 5e0310b9-043a-421e-b19c-e63c4d68f42d
+		summarizeBy: none
+		sourceColumn: employee_business_key
+
+	column first_name
+		dataType: string
+		lineageTag: e13023ff-929a-4f8f-b6ea-d1abe647f829
+		summarizeBy: none
+		sourceColumn: first_name
+
+	column last_name
+		dataType: string
+		lineageTag: ee081251-88ae-4c91-9d2b-c11522794b55
+		summarizeBy: none
+		sourceColumn: last_name
+
+	column email_hash
+		dataType: string
+		lineageTag: 386252d4-7d2f-48e8-9785-5d580df7b68a
+		summarizeBy: none
+		sourceColumn: email_hash
+
+	column home_store_id
+		dataType: int64
+		lineageTag: aeaca30a-8494-49df-895a-69f49cda7471
+		summarizeBy: none
+		sourceColumn: home_store_id
+
+	column role
+		dataType: string
+		lineageTag: 121dfd57-42cb-4592-aaff-a1d659f483b0
+		summarizeBy: none
+		sourceColumn: role
+
+	column hire_date
+		dataType: dateTime
+		lineageTag: 6fd11466-f53a-4801-9408-3c96767bec23
+		summarizeBy: none
+		sourceColumn: hire_date
+
+	column termination_date
+		dataType: dateTime
+		lineageTag: a83a2084-9e78-4fbe-9694-2cfbffbd7714
+		summarizeBy: none
+		sourceColumn: termination_date
+
+	column is_active
+		dataType: int64
+		lineageTag: ecf10688-8fb4-4efc-922f-e1f8ca01bc30
+		summarizeBy: none
+		sourceColumn: is_active
+
+	partition dim_employee = entity
+		mode: directLake
+		source
+			entityName: dim_employee
+			schemaName: gold
+			expressionSource: DatabaseQuery
+

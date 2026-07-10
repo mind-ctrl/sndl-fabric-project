@@ -1,0 +1,64 @@
+relationship fd97a68e-2d10-4549-b847-99b0773bbe78
+	fromColumn: fact_sales_line_item.store_sk
+	toColumn: dim_store.store_sk
+
+relationship 2e120869-00f8-4b99-b870-b2f5aadde6da
+	fromColumn: fact_sales_line_item.product_sk
+	toColumn: dim_product.product_sk
+
+relationship 4f4e7af7-f5e4-4ce7-9c7c-ccc1a405ceb6
+	fromColumn: fact_sales_line_item.customer_sk
+	toColumn: dim_customer.customer_sk
+
+relationship d4c00a91-a386-4a14-a410-4b8e9a6d1bfb
+	fromColumn: fact_sales_line_item.transaction_date_id
+	toColumn: dim_date.date_id
+
+relationship 8d268870-1895-4b5b-b87a-82d3b851d624
+	fromColumn: fact_sales_line_item.promotion_id
+	toColumn: dim_promotion.promotion_id
+
+relationship c65e7db9-a892-4cef-97a4-143ca5bb7425
+	fromColumn: fact_sales_transaction.store_sk
+	toColumn: dim_store.store_sk
+
+relationship 2dbd311a-a132-4c99-91cb-9942c46ebe67
+	fromColumn: fact_sales_transaction.customer_sk
+	toColumn: dim_customer.customer_sk
+
+relationship d01de87a-7f6c-4010-96a3-d5266158cd99
+	fromColumn: fact_sales_transaction.transaction_date_id
+	toColumn: dim_date.date_id
+
+relationship 8f7f1d22-7779-4135-8fe5-6cabd170d78a
+	fromColumn: fact_sales_transaction.employee_id
+	toColumn: dim_employee.employee_id
+
+relationship c8e8de29-210e-4ee2-b79d-e71ee7c73811
+	fromColumn: fact_inventory_snapshot.store_sk
+	toColumn: dim_store.store_sk
+
+relationship 90c76ac7-cbdf-43d0-ab02-151124c6afdc
+	fromColumn: fact_inventory_snapshot.product_sk
+	toColumn: dim_product.product_sk
+
+relationship d34684bb-122e-4907-ae9a-166f0d3745b7
+	fromColumn: fact_inventory_snapshot.snapshot_date_id
+	toColumn: dim_date.date_id
+
+relationship 2268365b-9c7e-417c-993f-e55f9d64bf44
+	fromColumn: fact_loyalty_event.customer_sk
+	toColumn: dim_customer.customer_sk
+
+relationship 51d7d8ee-1208-403e-9cae-ab35368a73d1
+	fromColumn: fact_loyalty_event.event_date_id
+	toColumn: dim_date.date_id
+
+relationship 81182b2a-86d9-4f97-9be0-c953d6daa568
+	fromColumn: dim_store.banner_id
+	toColumn: dim_banner.banner_id
+
+relationship ef298e9a-0756-447d-8978-dbb39dfa5fea
+	fromColumn: dim_product.category_id
+	toColumn: dim_category.category_id
+

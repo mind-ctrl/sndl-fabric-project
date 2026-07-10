@@ -1,0 +1,165 @@
+table dim_store
+	lineageTag: 367e251a-b450-4dec-946a-cee9e4f7a6b4
+
+	column store_id
+		dataType: int64
+		lineageTag: 6354fe23-512d-4e46-83cc-cdfc4aa85321
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column store_number
+		dataType: string
+		lineageTag: 7cf41515-113c-4c5e-8bcf-80d1fc1b713a
+		summarizeBy: none
+		sourceColumn: store_number
+
+	column store_name
+		dataType: string
+		lineageTag: 7c545fb4-84d7-4745-85ee-ede60dd63938
+		summarizeBy: none
+		sourceColumn: store_name
+
+	column banner_id
+		dataType: int64
+		lineageTag: dfe9e056-f4cc-40cc-be5c-67b242e0ff13
+		summarizeBy: none
+		sourceColumn: banner_id
+
+	column banner_name
+		dataType: string
+		lineageTag: e778bdff-dd9e-4b3d-ab26-f709e250792e
+		summarizeBy: none
+		sourceColumn: banner_name
+
+	column province_code
+		dataType: string
+		lineageTag: 237ffcf4-da42-4efa-b9df-648e8605dcf2
+		summarizeBy: none
+		sourceColumn: province_code
+
+	column province_name
+		dataType: string
+		lineageTag: 2a509236-e3e8-4d79-a44e-9b3872535dc3
+		summarizeBy: none
+		sourceColumn: province_name
+
+	column city
+		dataType: string
+		lineageTag: 4ebd5890-07e6-400d-aef8-0b290960fbe9
+		summarizeBy: none
+		sourceColumn: city
+
+	column address_line1
+		dataType: string
+		lineageTag: 06f8f8fa-2722-4f79-8327-24a7f1bf9e21
+		summarizeBy: none
+		sourceColumn: address_line1
+
+	column postal_code
+		dataType: string
+		lineageTag: d5cd51b0-8046-4b9e-933c-fa15b1dea4e7
+		summarizeBy: none
+		sourceColumn: postal_code
+
+	column fsa
+		dataType: string
+		lineageTag: 150c3e27-5417-46d3-bd66-9bc2f06fb78f
+		summarizeBy: none
+		sourceColumn: fsa
+
+	column latitude
+		dataType: double
+		lineageTag: c15058c7-efae-4cb2-84c7-7295a59968e3
+		summarizeBy: none
+		sourceColumn: latitude
+
+	column longitude
+		dataType: double
+		lineageTag: 4ab390fb-edf3-45f6-a35b-14266ab2398e
+		summarizeBy: none
+		sourceColumn: longitude
+
+	column square_footage
+		dataType: int64
+		lineageTag: 6ab296db-1540-40e6-8ed4-2bfda5e3d69b
+		summarizeBy: none
+		sourceColumn: square_footage
+
+	column store_type
+		dataType: string
+		lineageTag: 63e209e8-f84a-409b-adb7-55d4ad36b064
+		summarizeBy: none
+		sourceColumn: store_type
+
+	column open_date
+		dataType: dateTime
+		lineageTag: f86c3cbc-be75-4c9f-a1e1-60575c6f9bf7
+		summarizeBy: none
+		sourceColumn: open_date
+
+	column close_date
+		dataType: dateTime
+		lineageTag: c1edd462-5755-4679-8910-99cecebaef1c
+		summarizeBy: none
+		sourceColumn: close_date
+
+	column manager_employee_id
+		dataType: int64
+		lineageTag: 9adf0492-f449-4a78-b986-d0e6d43f9816
+		summarizeBy: none
+		sourceColumn: manager_employee_id
+
+	column district
+		dataType: string
+		lineageTag: ef80f658-4318-499d-9cef-cce08fff8363
+		summarizeBy: none
+		sourceColumn: district
+
+	column region
+		dataType: string
+		lineageTag: 176f1a70-d088-42b6-a3d2-91e924125784
+		summarizeBy: none
+		sourceColumn: region
+
+	column store_sk
+		dataType: int64
+		isHidden
+		lineageTag: b511f86e-5902-41f6-b94a-1fb890c8940c
+		summarizeBy: none
+		sourceColumn: store_sk
+
+	column scd_hash
+		dataType: string
+		isHidden
+		lineageTag: 7c75a0e8-e881-4420-bb64-fcf2d3177f71
+		summarizeBy: none
+		sourceColumn: scd_hash
+
+	column effective_from
+		dataType: dateTime
+		isHidden
+		lineageTag: a7b57b5c-e431-4c09-9fa5-02a424aeb88b
+		summarizeBy: none
+		sourceColumn: effective_from
+
+	column effective_to
+		dataType: dateTime
+		isHidden
+		lineageTag: 4613c686-6f2a-4198-ba46-03f93ebedeec
+		summarizeBy: none
+		sourceColumn: effective_to
+
+	column is_current
+		dataType: int64
+		isHidden
+		lineageTag: 7fea8535-8fdb-4c0c-b937-8890c1ef83b3
+		summarizeBy: none
+		sourceColumn: is_current
+
+	partition dim_store = entity
+		mode: directLake
+		source
+			entityName: dim_store
+			schemaName: gold
+			expressionSource: DatabaseQuery
+

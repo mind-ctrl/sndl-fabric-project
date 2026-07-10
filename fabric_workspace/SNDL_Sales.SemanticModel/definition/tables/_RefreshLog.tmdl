@@ -1,0 +1,20 @@
+/// Single-row import table stamped at refresh time; feeds the 'Last Refreshed Label' measure.
+table _RefreshLog
+	isHidden
+	lineageTag: 1a2b3c4d-0003-4a00-9000-000000000001
+
+	column RefreshedAt
+		dataType: dateTime
+		isHidden
+		lineageTag: 1a2b3c4d-0004-4a00-9000-000000000001
+		summarizeBy: none
+		sourceColumn: RefreshedAt
+
+	partition _RefreshLog = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [RefreshedAt = datetime], {{DateTime.LocalNow()}})
+				in
+				    Source
+

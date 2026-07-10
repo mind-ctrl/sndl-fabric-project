@@ -1,0 +1,40 @@
+table dim_category
+	lineageTag: d78f94e0-8ff0-4e48-8433-b3f68419b491
+
+	column category_id
+		dataType: int64
+		lineageTag: 356717d2-67f5-4244-8e31-a3623cfd5890
+		summarizeBy: none
+		sourceColumn: category_id
+
+	column category_name
+		dataType: string
+		lineageTag: f5ce0384-db5c-4fb8-911b-c5d58f25e448
+		summarizeBy: none
+		sourceColumn: category_name
+
+	column subcategory_name
+		dataType: string
+		lineageTag: 4ce49d4b-e643-4015-aab7-e08ed9ff449d
+		summarizeBy: none
+		sourceColumn: subcategory_name
+
+	column department
+		dataType: string
+		lineageTag: f3079a1a-06c7-479b-a94e-44b3ce979bbb
+		summarizeBy: none
+		sourceColumn: department
+
+	column display_order
+		dataType: int64
+		lineageTag: 26dbdd2a-3524-492a-b03f-c4a0b433062d
+		summarizeBy: none
+		sourceColumn: display_order
+
+	partition dim_category = entity
+		mode: directLake
+		source
+			entityName: dim_category
+			schemaName: gold
+			expressionSource: DatabaseQuery
+
